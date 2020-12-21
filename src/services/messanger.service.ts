@@ -1,19 +1,38 @@
+import { MESSAGING_URL } from '../config'
 import { Game, Question } from '../interfaces/games.interface'
+import { init, sendMessage, updateMessage } from './messaging_service'
+import { formatQuestionMessage, formatStartGameMessage, formatQuestionAnsweredMessage, formatEndOfGameMessage } from './message_formatter'
+import { gameModel } from '../models/games.model'
 
 export class MessangerService {
+  constructor() {
+    init(MESSAGING_URL)
+  }
   public async sendStartGameInMessage(game: Game, time: number): Promise<void> {
-    // send to messaging service
+    console.dir(game)
+    console.dir(time)
   }
   public async sendStartGameMessage(game: Game): Promise<void> {
-    // send to messaging service
+    const messages = await sendMessage(game.access_token, formatStartGameMessage(game))
+
+    const status = gameModel.getStatus(game.id)
+    status.message_id = messages[0].id
   }
-  public async sendQuestionMessage(question: Question): Promise<void> {
-    // send to messaging service
+  public async sendQuestionMessage(game: Game, question: Question): Promise<void> {
+    const messages = await sendMessage(game.access_token, formatQuestionMessage(game, question))
+
+    const status = gameModel.getStatus(game.id)
+    status.current_question_message_id = messages[0].id
   }
-  public async updateQuestionAnswer(question: Question, participant: string): Promise<void> {
-    // send to messaging service
+  public async updateQuestionAnswered(game: Game, question: Question, participant: string): Promise<void> {
+    const status = gameModel.getStatus(game.id)
+    await updateMessage(
+      game.access_token,
+      { message_id: status.current_question_message_id },
+      formatQuestionAnsweredMessage(game, question, participant),
+    )
   }
-  public async sendEndOfGameMessage(game: Game): Promise<void> {
-    // send to messaging service
+  public async sendEndOfGameMessage(game: Game, winner: string): Promise<void> {
+    await sendMessage(game.access_token, formatEndOfGameMessage(game, winner))
   }
 }

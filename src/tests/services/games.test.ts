@@ -17,6 +17,8 @@ describe('Testing Game Runners', () => {
 
   const gameDto: CreateGameDto = {
     name: 'test-game',
+    access_token: 'access_token',
+    channel_id: 'channel_id',
     questions: [
       {
         question: 'Q1',
@@ -54,7 +56,7 @@ describe('Testing Game Runners', () => {
       sendStartGameInMessage: jest.fn(),
       sendStartGameMessage: jest.fn(),
       sendQuestionMessage: jest.fn(),
-      updateQuestionAnswer: jest.fn(),
+      updateQuestionAnswered: jest.fn(),
       sendEndOfGameMessage: jest.fn(),
     }
 

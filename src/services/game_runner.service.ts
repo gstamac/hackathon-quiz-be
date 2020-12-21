@@ -1,5 +1,5 @@
 import { HttpException } from '../exceptions/HttpException'
-import { Answer, Game, ParticipantAnswer } from '../interfaces/games.interface'
+import { Game, ParticipantAnswer } from '../interfaces/games.interface'
 import { gameModel } from '../models/games.model'
 import { MessangerService } from './messanger.service'
 
@@ -43,15 +43,32 @@ export class GameRunnerService {
     const status = gameModel.getStatus(game.id)
 
     if (answer !== undefined) {
-      await this.messangerService.updateQuestionAnswer(game.questions[status.current_question], answer.participant)
+      await this.messangerService.updateQuestionAnswered(game, game.questions[status.current_question], answer.participant)
     }
 
     status.current_question++
 
     if (game.questions.length > status.current_question) {
-      await this.messangerService.sendQuestionMessage(game.questions[status.current_question])
+      await this.messangerService.sendQuestionMessage(game, game.questions[status.current_question])
     } else {
-      await this.messangerService.sendEndOfGameMessage(game)
+      const leaderboard = status.participantAnswers
+        .filter(a => a.is_correct)
+        .reduce((board, a) => {
+          const r = board.find(p => p.participant === a.participant)
+          if (r !== undefined) {
+            r.correct++
+          } else {
+            board.push({
+              participant: a.participant,
+              correct: 1,
+            })
+          }
+
+          return board
+        }, [])
+        .sort((b1, b2) => b2.correct - b1.correct)
+
+      await this.messangerService.sendEndOfGameMessage(game, leaderboard[0].participant)
     }
   }
 

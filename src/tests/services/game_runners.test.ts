@@ -15,6 +15,8 @@ describe('Testing Game Runners', () => {
 
   const game: Game = {
     id: 'test-game-id',
+    access_token: 'access_token',
+    channel_id: 'channel_id',
     name: 'test-game',
     questions: [
       {
@@ -51,7 +53,7 @@ describe('Testing Game Runners', () => {
       sendStartGameInMessage: jest.fn(),
       sendStartGameMessage: jest.fn(),
       sendQuestionMessage: jest.fn(),
-      updateQuestionAnswer: jest.fn(),
+      updateQuestionAnswered: jest.fn(),
       sendEndOfGameMessage: jest.fn(),
     }
 
@@ -72,7 +74,7 @@ describe('Testing Game Runners', () => {
       // expect(messanger.sendStartGameInMessage).toBeCalledWith(game, 2)
       // expect(messanger.sendStartGameInMessage).toBeCalledWith(game, 1)
       expect(messanger.sendStartGameMessage).toBeCalledWith(game)
-      expect(messanger.sendQuestionMessage).toBeCalledWith(game.questions[0])
+      expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[0])
     })
   })
 
@@ -88,9 +90,9 @@ describe('Testing Game Runners', () => {
 
       await delay(10)
 
-      expect(messanger.sendQuestionMessage).toBeCalledWith(game.questions[0])
-      expect(messanger.updateQuestionAnswer).toBeCalledWith(game.questions[0], 'participant1')
-      expect(messanger.sendQuestionMessage).toBeCalledWith(game.questions[1])
+      expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[0])
+      expect(messanger.updateQuestionAnswered).toBeCalledWith(game, game.questions[0], 'participant1')
+      expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[1])
     })
 
     it('should accept incorrect answer and not send next question', async () => {
@@ -104,9 +106,9 @@ describe('Testing Game Runners', () => {
 
       await delay(10)
 
-      expect(messanger.sendQuestionMessage).toBeCalledWith(game.questions[0])
-      expect(messanger.sendQuestionMessage).not.toBeCalledWith(game.questions[1])
-      expect(messanger.updateQuestionAnswer).not.toBeCalled()
+      expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[0])
+      expect(messanger.sendQuestionMessage).not.toBeCalledWith(game, game.questions[1])
+      expect(messanger.updateQuestionAnswered).not.toBeCalled()
     })
 
     it('should accept all correct answer and send end of game', async () => {
@@ -118,7 +120,7 @@ describe('Testing Game Runners', () => {
         is_correct: true,
       })
       await gameRunner.acceptAnswer(game, {
-        participant: 'participant1',
+        participant: 'participant2',
         question_id: game.questions[1].id,
         answer_id: game.questions[1].answers[1].id,
         is_correct: true,
@@ -132,13 +134,13 @@ describe('Testing Game Runners', () => {
 
       await delay(10)
 
-      expect(messanger.sendQuestionMessage).toBeCalledWith(game.questions[0])
-      expect(messanger.updateQuestionAnswer).toBeCalledWith(game.questions[0], 'participant1')
-      expect(messanger.sendQuestionMessage).toBeCalledWith(game.questions[1])
-      expect(messanger.updateQuestionAnswer).toBeCalledWith(game.questions[1], 'participant1')
-      expect(messanger.sendQuestionMessage).toBeCalledWith(game.questions[2])
-      expect(messanger.updateQuestionAnswer).toBeCalledWith(game.questions[2], 'participant1')
-      expect(messanger.sendEndOfGameMessage).toBeCalledWith(game)
+      expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[0])
+      expect(messanger.updateQuestionAnswered).toBeCalledWith(game, game.questions[0], 'participant1')
+      expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[1])
+      expect(messanger.updateQuestionAnswered).toBeCalledWith(game, game.questions[1], 'participant2')
+      expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[2])
+      expect(messanger.updateQuestionAnswered).toBeCalledWith(game, game.questions[2], 'participant1')
+      expect(messanger.sendEndOfGameMessage).toBeCalledWith(game, 'participant1')
     })
   })
 })

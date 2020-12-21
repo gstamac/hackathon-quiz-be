@@ -1,10 +1,10 @@
 import { CreateGameDto, CreateParticipantAnswerDto } from '../dtos/games.dto'
 import { HttpException } from '../exceptions/HttpException'
-import { Answer, Game, Question } from '../interfaces/games.interface'
+import { Answer, Game, ParticipantAnswer, Question } from '../interfaces/games.interface'
 import { gameModel } from '../models/games.model'
 import { isEmpty } from '../utils/util'
 import { v4 } from 'uuid'
-import { GameRunnerService, ParticipantAnswer } from './game_runner.service'
+import { GameRunnerService } from './game_runner.service'
 import { MessangerService } from './messanger.service'
 
 export class GamesService {
@@ -15,6 +15,8 @@ export class GamesService {
 
     const game: Game = {
       id: v4(),
+      access_token: gameData.access_token,
+      channel_id: gameData.channel_id,
       name: gameData.name,
       questions: gameData.questions.map(q => ({
         id: v4(),

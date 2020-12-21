@@ -31,5 +31,11 @@ export class CreateGameDto {
   @IsString()
   public name: string
 
+  @IsString()
+  public access_token: string
+
+  @IsString()
+  public channel_id: string
+
   public questions: CreateQuestionDto[]
 }

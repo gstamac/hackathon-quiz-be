@@ -1,10 +1,12 @@
 import supertest from 'supertest'
+import nock from 'nock'
 import { App } from '../app'
 import { Game } from '../interfaces/games.interface'
 import { gameModel } from '../models/games.model'
 import { AnswersRoute } from '../routes/answers.route'
 import { GamesRoute } from '../routes/games.route'
 import { delay } from '../utils/util'
+import { MESSAGING_URL } from '../config'
 
 afterAll(async () => {
   await delay(500)
@@ -17,11 +19,21 @@ describe('Testing Answers', () => {
     beforeEach(() => {
       const app = new App([new GamesRoute(), new AnswersRoute()])
       request = supertest(app.getServer())
+      nock(`${MESSAGING_URL}`)
+        .post('/v1/messages')
+        .reply(200, [{ id: 'message-id' }])
+        .persist()
+      nock(`${MESSAGING_URL}`)
+        .put('/v1/message-cards')
+        .reply(200, [{ id: 'message-id' }])
+        .persist()
 
       gameModel.clear()
 
       const game: Game = {
         id: 'test-game-id',
+        access_token: 'access_token',
+        channel_id: 'channel_id',
         name: 'test-game',
         questions: [
           {
@@ -32,10 +44,6 @@ describe('Testing Answers', () => {
               { id: 'test-game-q1-a2', answer: 'Q1A2', is_correct: false },
               { id: 'test-game-q1-a3', answer: 'Q1A3', is_correct: true },
             ],
-            // participantAnswers: [
-            //   { id: 'part-answ-1', participant: 'participant1', answer_id: 'test-game-q1-a1', is_correct: false },
-            //   { id: 'part-answ-2', participant: 'participant2', answer_id: 'test-game-q1-a3', is_correct: true },
-            // ],
           },
           {
             id: 'test-game-q2',
@@ -45,7 +53,6 @@ describe('Testing Answers', () => {
               { id: 'test-game-q2-a2', answer: 'Q2A2', is_correct: true },
               { id: 'test-game-q2-a3', answer: 'Q2A3', is_correct: false },
             ],
-            // participantAnswers: [{ id: 'part-answ-3', participant: 'participant2', answer_id: 'test-game-q2-a1', is_correct: false }],
           },
           {
             id: 'test-game-q3',
@@ -54,7 +61,6 @@ describe('Testing Answers', () => {
               { id: 'test-game-q3-a1', answer: 'Q3A1', is_correct: false },
               { id: 'test-game-q3-a2', answer: 'Q3A2', is_correct: true },
             ],
-            // participantAnswers: [],
           },
         ],
       }

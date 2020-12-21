@@ -12,6 +12,8 @@ export interface Question {
 
 export interface Game {
   id: string
+  channel_id: string
+  access_token: string
   name: string
   questions: Question[]
 }
@@ -25,6 +27,8 @@ export interface ParticipantAnswer {
 
 export interface GameStatus {
   game_id: string
+  message_id?: string
   current_question: number
+  current_question_message_id?: string
   participantAnswers: ParticipantAnswer[]
 }

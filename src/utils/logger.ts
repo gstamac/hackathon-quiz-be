@@ -1,19 +1,19 @@
-import fs from 'fs';
-import winston from 'winston';
-import winstonDaily from 'winston-daily-rotate-file';
+import fs from 'fs'
+import winston from 'winston'
+import winstonDaily from 'winston-daily-rotate-file'
 
 // logs dir
-const logDir = __dirname + '/../logs';
+const logDir = __dirname + '/../logs'
 
 if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir);
+  fs.mkdirSync(logDir)
 }
 
 // winston format
-const { combine, timestamp, printf } = winston.format;
+const { combine, timestamp, printf } = winston.format
 
 // Define log format
-const logFormat = printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`);
+const logFormat = printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`)
 
 /*
  * Log Level
@@ -49,18 +49,18 @@ const logger = winston.createLogger({
       zippedArchive: true,
     }),
   ],
-});
+})
 
 logger.add(
   new winston.transports.Console({
     format: winston.format.combine(winston.format.splat(), winston.format.colorize(), winston.format.simple()),
   }),
-);
+)
 
 const stream = {
   write: (message: string) => {
-    logger.info(message.substring(0, message.lastIndexOf('\n')));
+    logger.info(message.substring(0, message.lastIndexOf('\n')))
   },
-};
+}
 
-export { logger, stream };
+export { logger, stream }

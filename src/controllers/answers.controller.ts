@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { CreateParticipantAnswerDto } from '../dtos/games.dto'
+import { ParticipantAnswer } from '../interfaces/games.interface'
 import { gamesService } from '../services/games.service'
-import { ParticipantAnswer } from '../services/game_runner.service'
 
 export class AnswersController {
   public createAnswer = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
