@@ -3,124 +3,125 @@ tags:
   description: users API
 
 paths:
-# [GET] users
-  /users:
-    get:
-      tags:
-      - users
-      summary: Find All Users
-      responses:
-        200:
-          description: 'OK'
-        500:
-          description: 'Server Error'
-
-# [POST] users
+  /games:
     post:
-      tags:
-      - users
-      summary: Add User
+      summary: Create game
       parameters:
       - name: body
         in: body
-        description: user Data
+        description: game data
         required: true
         schema:
-          $ref: '#/definitions/users'
+          $ref: '#/definitions/game'
       responses:
         201:
           description: 'Created'
         400:
           description: 'Bad Request'
-        409:
-          description: 'Conflict'
         500:
           description: 'Server Error'
 
-# [GET] users/id
-  /users/{id}:
+  /games/{game_id}:
     get:
-      tags:
-      - users
-      summary: Find User By Id
+      summary: Get a game
       parameters:
-      - name: id
+      - name: game_id
         in: path
-        description: User Id
+        description: Game Id
         required: true
-        type: integer
+        type: string
       responses:
         200:
-          description: 'OK'
-        409:
-          description: 'Conflict'
+          description: game
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/game'
         500:
           description: 'Server Error'
 
-# [PUT] users/id
-    put:
-      tags:
-      - users
-      summary: Update User By Id
+  /games/{game_id}/answers:
+    post:
+      summary: Post an answer
       parameters:
-      - name: id
+      - name: game_id
         in: path
-        description: user Id
+        description: Game Id
         required: true
-        type: integer
-      - name: body
-        in: body
-        description: user Data
+        type: string
+      - name: question_id
+        in: query
+        description: Question Id
         required: true
-        schema:
-          $ref: '#/definitions/users'
+        type: string
+      - name: answer_id
+        in: query
+        description: Answer Id
+        required: true
+        type: string
+      - name: participant
+        in: query
+        description: Participant who answered
+        required: true
+        type: string
       responses:
-        200:
-          description: 'OK'
+        201:
+          description: 'Created'
         400:
           description: 'Bad Request'
-        409:
-          description: 'Conflict'
         500:
           description: 'Server Error'
 
-# [DELETE] users/id
-    delete:
-      tags:
-      - users
-      summary: Delete User By Id
-      parameters:
-      - name: id
-        in: path
-        description: user Id
-        required: true
-        type: integer
-      responses:
-        200:
-          description: 'OK'
-        409:
-          description: 'Conflict'
-        500:
-          description: 'Server Error'
-
-# definitions
 definitions:
-  users:
+  game:
     type: object
     required:
-        - email
-        - password
+        - name
+        - access_token
+        - channel_id
+        - questions
     properties:
-      id:
-        type: integer
-        description: user Id
-      email:
+      name:
         type: string
-        description: user Email
-      password:
+        description: game name
+      access_token:
         type: string
-        description: user Password
-
+        description: access token to be used for messaging
+      channel_id:
+        type: string
+        description: channel id to be used for messaging
+      questions:
+        type: array
+        description: questions for the game
+        items:
+          type: object
+          $ref: '#/definitions/question'
+  question:
+    type: object
+    required:
+        - question
+        - answers
+    properties:
+      question:
+        type: string
+        description: question text
+      answers:
+        type: array
+        description: answers for the question
+        items:
+          type: object
+          $ref: '#/definitions/answer'
+  answer:
+    type: object
+    required:
+        - answer
+    properties:
+      answer:
+        type: string
+        description: answer text
+      is_correct:
+        type: boolean
+        description: is this the correct answer
 schemes:
  - https
  - http
