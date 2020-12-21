@@ -42,7 +42,7 @@ export class GameRunnerService {
   private async sendNextQuestion(game: Game, answer?: ParticipantAnswer) {
     const status = gameModel.getStatus(game.id)
 
-    if (answer !== undefined) {
+    if (answer !== undefined && status.current_question >= 0) {
       await this.messangerService.updateQuestionAnswered(game, game.questions[status.current_question], answer.participant)
     }
 

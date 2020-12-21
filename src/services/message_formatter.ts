@@ -85,7 +85,7 @@ export function formatQuestionMessage(game: Game, question: Question): AddMessag
   }
 }
 
-export function formatQuestionAnsweredMessage(game: Game, question: Question, participant: string): UpdateMessageContent {
+export function formatQuestionAnsweredMessage(question: Question, participant: string): UpdateMessageContent {
   const element: MessageCardElement = {
     icon: {
       type: 'HACKATON_ICON',

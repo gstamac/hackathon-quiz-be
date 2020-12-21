@@ -26,11 +26,7 @@ export class MessangerService {
   }
   public async updateQuestionAnswered(game: Game, question: Question, participant: string): Promise<void> {
     const status = gameModel.getStatus(game.id)
-    await updateMessage(
-      game.access_token,
-      { message_id: status.current_question_message_id },
-      formatQuestionAnsweredMessage(game, question, participant),
-    )
+    await updateMessage(game.access_token, { message_id: status.current_question_message_id }, formatQuestionAnsweredMessage(question, participant))
   }
   public async sendEndOfGameMessage(game: Game, winner: string): Promise<void> {
     await sendMessage(game.access_token, formatEndOfGameMessage(game, winner))

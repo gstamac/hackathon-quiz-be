@@ -46,6 +46,10 @@ export class GamesService {
     return game
   }
 
+  public async deleteGame(game_id: string): Promise<void> {
+    gameModel.deleteGame(game_id)
+  }
+
   public async createParticipantAnswer(game_id: string, answerData: CreateParticipantAnswerDto): Promise<ParticipantAnswer> {
     if (isEmpty(answerData)) {
       throw new HttpException(400, 'Answer data missing')

@@ -16,7 +16,6 @@ export class GamesRoute implements Route {
   private initializeRoutes() {
     this.router.get(`${this.path}/:id`, this.gamesController.getGame)
     this.router.post(`${this.path}`, validationMiddleware(CreateGameDto, 'body'), this.gamesController.createGame)
-    // this.router.put(`${this.path}/:id(\\d+)`, validationMiddleware(CreateGameDto, 'body', true), this.gamesController.updateUser)
-    // this.router.delete(`${this.path}/:id(\\d+)`, this.gamesController.deleteUser)
+    this.router.delete(`${this.path}/:id`, this.gamesController.deleteGame)
   }
 }

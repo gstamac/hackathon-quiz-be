@@ -39,6 +39,19 @@ paths:
                 $ref: '#/definitions/game'
         500:
           description: 'Server Error'
+    delete:
+      summary: Delete a game
+      parameters:
+      - name: game_id
+        in: path
+        description: Game Id
+        required: true
+        type: string
+      responses:
+        204:
+          description: no content
+        500:
+          description: 'Server Error'
 
   /games/{game_id}/answers:
     post:

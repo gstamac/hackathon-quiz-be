@@ -6,6 +6,8 @@ import { CreateGameDto } from '../dtos/games.dto'
 import { delay } from '../utils/util'
 import { AnswersRoute } from '../routes/answers.route'
 import { MESSAGING_URL } from '../config'
+import { Game } from '../interfaces/games.interface'
+import { gameModel } from '../models/games.model'
 
 afterAll(async () => {
   await delay(500)
@@ -49,6 +51,74 @@ describe('Testing Games', () => {
         ],
       }
       await request.post('/games').send(gameData).expect(201)
+    })
+  })
+
+  describe('[GET] /games/:game_id', () => {
+    let request: supertest.SuperTest<supertest.Test>
+
+    const game: Game = {
+      id: 'test-game-id',
+      access_token: 'access_token',
+      channel_id: 'channel_id',
+      name: 'test-game',
+      questions: [],
+    }
+
+    beforeEach(() => {
+      const app = new App([new GamesRoute(), new AnswersRoute()])
+      request = supertest(app.getServer())
+      nock(`${MESSAGING_URL}`)
+        .post('/v1/messages')
+        .reply(200, [{ id: 'message-id' }])
+        .persist()
+      nock(`${MESSAGING_URL}`)
+        .put('/v1/message-cards')
+        .reply(200, [{ id: 'message-id' }])
+        .persist()
+
+      gameModel.clear()
+
+      gameModel.addGame(game)
+    })
+
+    it('response statusCode 200', async () => {
+      await request.get('/games/test-game-id').expect(200, game)
+    })
+  })
+
+  describe('[DELETE] /games/:game_id', () => {
+    let request: supertest.SuperTest<supertest.Test>
+
+    const game: Game = {
+      id: 'test-game-id',
+      access_token: 'access_token',
+      channel_id: 'channel_id',
+      name: 'test-game',
+      questions: [],
+    }
+
+    beforeEach(() => {
+      const app = new App([new GamesRoute(), new AnswersRoute()])
+      request = supertest(app.getServer())
+      nock(`${MESSAGING_URL}`)
+        .post('/v1/messages')
+        .reply(200, [{ id: 'message-id' }])
+        .persist()
+      nock(`${MESSAGING_URL}`)
+        .put('/v1/message-cards')
+        .reply(200, [{ id: 'message-id' }])
+        .persist()
+
+      gameModel.clear()
+
+      gameModel.addGame(game)
+    })
+
+    it('response statusCode 204', async () => {
+      await request.delete('/games/test-game-id').expect(204)
+
+      expect(gameModel.findGame('test-game-id')).toBeUndefined()
     })
   })
 })

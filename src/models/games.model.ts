@@ -17,6 +17,14 @@ class GameModel {
     return this.games.find(g => g.id === game_id)
   }
 
+  public deleteGame(game_id: string): void {
+    const index = this.games.findIndex(g => g.id === game_id)
+
+    if (index >= 0) {
+      this.games.splice(index, 1)
+    }
+  }
+
   public createStatus(game_id: string): GameStatus {
     const status = {
       game_id,
