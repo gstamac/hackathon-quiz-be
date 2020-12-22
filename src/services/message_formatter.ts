@@ -3,7 +3,17 @@ import { BASE_URL } from '../config'
 import { Game, Question } from '../interfaces/games.interface'
 import { AddMessageBody, MessageCardElement, UpdateMessageContent } from './messaging_interfaces'
 
-export function formatStartGameMessage(game: Game): AddMessageBody {
+export function formatMessage(game: Game, content: UpdateMessageContent): AddMessageBody {
+  return {
+    message: {
+      uuid: v4(),
+      ...content,
+    },
+    channels: [game.channel_id],
+  }
+}
+
+export function formatStartGameContent(): UpdateMessageContent {
   const element: MessageCardElement = {
     icon: {
       type: 'HACKATON_ICON',
@@ -15,16 +25,33 @@ export function formatStartGameMessage(game: Game): AddMessageBody {
   }
 
   return {
-    message: {
-      uuid: v4(),
-      type: 'CARD_VIEW',
-      content: JSON.stringify({
-        text: 'Quiz has started',
-        elements: element,
-        payload: {},
-      }),
+    type: 'CARD_VIEW',
+    content: JSON.stringify({
+      text: 'Quiz has started',
+      elements: element,
+      payload: {},
+    }),
+  }
+}
+
+export function formatStartGameInContent(time: number): UpdateMessageContent {
+  const element: MessageCardElement = {
+    icon: {
+      type: 'HACKATON_ICON',
     },
-    channels: [game.channel_id],
+    title_text: `Quiz will start in ${time} seconds`,
+    primary_text: `Quiz will start in ${time} seconds`,
+    secondary_text: '',
+    additional_text: '',
+  }
+
+  return {
+    type: 'CARD_VIEW',
+    content: JSON.stringify({
+      text: `Quiz will start in ${time} seconds`,
+      elements: element,
+      payload: {},
+    }),
   }
 }
 
@@ -39,18 +66,14 @@ export function formatEndOfGameMessage(game: Game, winner: string): AddMessageBo
     additional_text: '',
   }
 
-  return {
-    message: {
-      uuid: v4(),
-      type: 'CARD_VIEW',
-      content: JSON.stringify({
-        text: 'Quiz has ended',
-        elements: element,
-        payload: {},
-      }),
-    },
-    channels: [game.channel_id],
-  }
+  return formatMessage(game, {
+    type: 'CARD_VIEW',
+    content: JSON.stringify({
+      text: 'Quiz has ended',
+      elements: element,
+      payload: {},
+    }),
+  })
 }
 
 export function formatEndOfGameNoAnswersMessage(game: Game): AddMessageBody {
@@ -95,21 +118,17 @@ export function formatQuestionMessage(game: Game, question: Question): AddMessag
     })),
   }
 
-  return {
-    message: {
-      uuid: v4(),
-      type: 'CARD_VIEW',
-      content: JSON.stringify({
-        text: `Question: ${question.question}`,
-        elements: element,
-        payload: {},
-      }),
-    },
-    channels: [game.channel_id],
-  }
+  return formatMessage(game, {
+    type: 'CARD_VIEW',
+    content: JSON.stringify({
+      text: `Question: ${question.question}`,
+      elements: element,
+      payload: {},
+    }),
+  })
 }
 
-export function formatQuestionAnsweredMessage(question: Question, participant: string): UpdateMessageContent {
+export function formatQuestionAnsweredContent(question: Question, participant: string): UpdateMessageContent {
   const element: MessageCardElement = {
     icon: {
       type: 'HACKATON_ICON',

@@ -8,7 +8,7 @@ import { GameRunnerService } from './game_runner.service'
 import { MessangerService } from './messanger.service'
 
 export class GamesService {
-  constructor(private gamesModel: GamesModel, private gameRunnerService: GameRunnerService, private messangerService: MessangerService) {}
+  constructor(private gamesModel: GamesModel, private gameRunnerService: GameRunnerService) {}
 
   public async createGame(gameData: CreateGameDto): Promise<Game> {
     if (isEmpty(gameData)) throw new HttpException(400, 'Game data missing')
@@ -30,7 +30,7 @@ export class GamesService {
       })),
     }
 
-    this.gamesModel.addGame(game)
+    await this.gamesModel.addGame(game)
 
     await this.gameRunnerService.startGame(game)
 
@@ -38,7 +38,7 @@ export class GamesService {
   }
 
   public async getGame(game_id: string): Promise<Game> {
-    const game: Game | undefined = this.gamesModel.findGame(game_id)
+    const game: Game | undefined = await this.gamesModel.findGame(game_id)
     if (game === undefined) {
       throw new HttpException(400, 'Game not found')
     }
@@ -47,7 +47,7 @@ export class GamesService {
   }
 
   public async deleteGame(game_id: string): Promise<void> {
-    this.gamesModel.deleteGame(game_id)
+    await this.gamesModel.deleteGame(game_id)
   }
 
   public async createParticipantAnswer(game_id: string, answerData: CreateParticipantAnswerDto): Promise<ParticipantAnswer> {
@@ -55,7 +55,7 @@ export class GamesService {
       throw new HttpException(400, 'Answer data missing')
     }
 
-    const game: Game | undefined = this.gamesModel.findGame(game_id)
+    const game: Game | undefined = await this.gamesModel.findGame(game_id)
     if (game === undefined) {
       throw new HttpException(400, 'Game not found')
     }

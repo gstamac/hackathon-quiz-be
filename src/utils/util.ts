@@ -1,3 +1,5 @@
+import { async } from 'rxjs'
+
 export const isEmpty = (value: any): boolean => {
   if (value === null) {
     return true
@@ -14,4 +16,12 @@ export const isEmpty = (value: any): boolean => {
 
 export async function delay(timeout: number): Promise<void> {
   await new Promise<void>(resolve => setTimeout(() => resolve(), timeout))
+}
+
+export interface Delayer {
+  delay(seconds: number): Promise<void>
+}
+
+export const delayer: Delayer = {
+  delay: async (seconds: number) => await delay(seconds * 1000),
 }

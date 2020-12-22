@@ -52,8 +52,10 @@ describe('Testing Games', () => {
       questions: [],
     }
 
-    beforeEach(() => {
-      gamesModel.addGame(game)
+    beforeEach(async () => {
+      await gamesModel.addGame(game)
+
+      await delay(500)
     })
 
     it('response statusCode 200', async () => {
@@ -70,14 +72,16 @@ describe('Testing Games', () => {
       questions: [],
     }
 
-    beforeEach(() => {
-      gamesModel.addGame(game)
+    beforeEach(async () => {
+      await gamesModel.addGame(game)
+
+      await delay(500)
     })
 
     it('response statusCode 204', async () => {
       await request.delete('/games/test-game-id').expect(204)
 
-      expect(gamesModel.findGame('test-game-id')).toBeUndefined()
+      expect(await gamesModel.findGame('test-game-id')).toBeUndefined()
     })
   })
 })

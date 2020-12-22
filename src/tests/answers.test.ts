@@ -18,7 +18,7 @@ describe('Testing Answers', () => {
   })
 
   describe('[POST] /games/:game_id/answers?question_id=<question_id>&answer_id=<answer_id>&participant=<participant>', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       const game: Game = {
         id: 'test-game-id',
         access_token: 'access_token',
@@ -54,7 +54,9 @@ describe('Testing Answers', () => {
         ],
       }
 
-      gamesModel.addGame(game)
+      await gamesModel.addGame(game)
+
+      await delay(500)
     })
 
     it('response statusCode 201 / created', async () => {

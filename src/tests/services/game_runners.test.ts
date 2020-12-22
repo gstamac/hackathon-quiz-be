@@ -58,20 +58,16 @@ describe('Testing Game Runners', () => {
       sendEndOfGameMessage: jest.fn(),
     } as unknown) as MessangerService
 
-    gameRunner = new GameRunnerService(new GamesModelInMemory(), messanger)
+    gameRunner = new GameRunnerService(new GamesModelInMemory(), messanger, { delay: jest.fn().mockResolvedValue(undefined) })
   })
 
   describe('startGame', () => {
     it('should start a game and send start game message 5 times', async () => {
       await gameRunner.startGame(game)
 
-      await delay(10)
+      await delay(100)
 
-      // expect(messanger.sendStartGameInMessage).toBeCalledWith(game, 5)
-      // expect(messanger.sendStartGameInMessage).toBeCalledWith(game, 4)
-      // expect(messanger.sendStartGameInMessage).toBeCalledWith(game, 3)
-      // expect(messanger.sendStartGameInMessage).toBeCalledWith(game, 2)
-      // expect(messanger.sendStartGameInMessage).toBeCalledWith(game, 1)
+      expect(messanger.sendStartGameInMessage).toBeCalledWith(game)
       expect(messanger.sendStartGameMessage).toBeCalledWith(game)
       expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[0])
     })
@@ -80,14 +76,14 @@ describe('Testing Game Runners', () => {
   describe('acceptAnswer', () => {
     it('should accept correct answer and send next question', async () => {
       await gameRunner.startGame(game)
+      await delay(100)
+
       await gameRunner.acceptAnswer(game, {
         participant: 'participant1',
         question_id: game.questions[0].id,
         answer_id: game.questions[0].answers[2].id,
         is_correct: true,
       })
-
-      await delay(10)
 
       expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[0])
       expect(messanger.updateQuestionAnswered).toBeCalledWith(game, game.questions[0], 'participant1')
@@ -96,14 +92,14 @@ describe('Testing Game Runners', () => {
 
     it('should accept incorrect answer and not send next question', async () => {
       await gameRunner.startGame(game)
+      await delay(100)
+
       await gameRunner.acceptAnswer(game, {
         participant: 'participant1',
         question_id: game.questions[0].id,
         answer_id: game.questions[0].answers[0].id,
         is_correct: false,
       })
-
-      await delay(10)
 
       expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[0])
       expect(messanger.sendQuestionMessage).not.toBeCalledWith(game, game.questions[1])
@@ -112,6 +108,8 @@ describe('Testing Game Runners', () => {
 
     it('should accept all correct answer and send end of game', async () => {
       await gameRunner.startGame(game)
+      await delay(100)
+
       await gameRunner.acceptAnswer(game, {
         participant: 'participant1',
         question_id: game.questions[0].id,
@@ -130,8 +128,6 @@ describe('Testing Game Runners', () => {
         answer_id: game.questions[2].answers[1].id,
         is_correct: true,
       })
-
-      await delay(10)
 
       expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[0])
       expect(messanger.updateQuestionAnswered).toBeCalledWith(game, game.questions[0], 'participant1')
