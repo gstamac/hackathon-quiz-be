@@ -55,8 +55,6 @@ describe('Testing Games', () => {
     }
 
     beforeEach(async () => {
-      game.id = v4()
-
       await gamesModel.addGame(game)
 
       await delay(500)
@@ -77,8 +75,6 @@ describe('Testing Games', () => {
     }
 
     beforeEach(async () => {
-      game.id = v4()
-
       await gamesModel.addGame(game)
 
       await delay(500)
