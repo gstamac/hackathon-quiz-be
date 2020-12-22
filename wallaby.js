@@ -1,6 +1,6 @@
 module.exports = function () {
   return {
-    files: [{ pattern: '.env', instrument: false }, { pattern: 'src/tests/**/*.ts', ignore: true }, 'src/**/*.ts'],
+    files: [{ pattern: '.env', instrument: false }, { pattern: 'src/tests/**/*.test.ts', ignore: true }, 'src/**/*.ts'],
     tests: ['src/tests/**/*.test.ts'],
     env: {
       type: 'node',

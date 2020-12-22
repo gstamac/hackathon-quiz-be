@@ -30,5 +30,5 @@ export interface GameStatus {
   message_id?: string
   current_question: number
   current_question_message_id?: string
-  participantAnswers: ParticipantAnswer[]
+  participant_answers: ParticipantAnswer[]
 }

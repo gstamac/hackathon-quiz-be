@@ -63,3 +63,5 @@ dist/
 
 ## Docker
 docker-compose.yml
+
+/game.db

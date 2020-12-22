@@ -1,20 +1,23 @@
 import Database from 'better-sqlite3'
 import { Game, GameStatus, ParticipantAnswer } from '../interfaces/games.interface'
 
-export class GamesService {
+export class GamesDbService {
   private db: Database.Database
 
-  public async init() {
+  public async init(clear = false) {
     this.db = new Database('game.db', {})
+
+    if (clear) {
+      await this.db.exec(`DROP TABLE IF EXISTS participant_answer;`)
+      await this.db.exec(`DROP TABLE IF EXISTS game_status;`)
+      await this.db.exec(`DROP TABLE IF EXISTS game;`)
+    }
 
     await this.db.exec(
       `CREATE TABLE IF NOT EXISTS game (id text primary key, channel_id integer, access_token text, name text, questions text, inserted_at DEFAULT CURRENT_TIMESTAMP, updated_at DEFAULT CURRENT_TIMESTAMP);`,
     )
     await this.db.exec(
-      `CREATE TABLE IF NOT EXISTS game_status (game_id text REFERENCES game(id), message_id text, current_question integer, current_question_message_id text, inserted_at DEFAULT CURRENT_TIMESTAMP, updated_at DEFAULT CURRENT_TIMESTAMP);`,
-    )
-    await this.db.exec(
-      `CREATE TABLE IF NOT EXISTS participant_answer (participant text, question_id text, anwser_id text, is_correct integer, inserted_at DEFAULT CURRENT_TIMESTAMP, updated_at DEFAULT CURRENT_TIMESTAMP);`,
+      `CREATE TABLE IF NOT EXISTS game_status (game_id text REFERENCES game(id), message_id text, current_question integer, current_question_message_id text, participant_answers text, inserted_at DEFAULT CURRENT_TIMESTAMP, updated_at DEFAULT CURRENT_TIMESTAMP);`,
     )
   }
 
@@ -26,18 +29,30 @@ export class GamesService {
 
   public async saveGameStatus(gameStatus: GameStatus) {
     await this.db
-      .prepare(`insert into game_status (game_id, message_id, current_question, current_question_message_id) values (?, ?, ?, ?);`)
-      .run(gameStatus.game_id, gameStatus.message_id, gameStatus.current_question, gameStatus.current_question_message_id)
-  }
-
-  public async saveParticipantAnswer(answer: ParticipantAnswer) {
-    await this.db
-      .prepare(`insert into participant_answer (participant, question_id, answer_id, is_correct) values (?, ?, ?, ?);`)
-      .run(answer.participant, answer.question_id, answer.answer_id, answer.is_correct ? 1 : 0)
+      .prepare(
+        `insert into game_status (game_id, message_id, current_question, current_question_message_id, participant_answers) values (?, ?, ?, ?, ?);`,
+      )
+      .run(
+        gameStatus.game_id,
+        gameStatus.message_id,
+        gameStatus.current_question,
+        gameStatus.current_question_message_id,
+        JSON.stringify(gameStatus.participant_answers),
+      )
   }
 
   public getGameById(id: string) {
-    return this.db.prepare(`select * from game where id = ?`).get(id) as Game
+    const game = this.db.prepare(`select * from game where id = ?`).get(id)
+
+    if (game !== undefined) {
+      game.questions = JSON.parse(game.questions as string)
+    }
+
+    return game
+  }
+
+  public async deleteGameById(id: string) {
+    await this.db.prepare(`DELETE from game where id = ?`).run(id)
   }
 
   public getGamesForChannel(channel_id: string) {
@@ -45,7 +60,13 @@ export class GamesService {
   }
 
   public getGameStatus(game_id: string) {
-    return this.db.prepare(`select * from gameStatus where channel_id = ?`).get(game_id) as GameStatus
+    const status = this.db.prepare(`select * from game_status where game_id = ?`).get(game_id)
+
+    if (status !== undefined) {
+      status.participant_answers = JSON.parse(status.participant_answers)
+    }
+
+    return status
   }
 
   public getParticipantAnswer(participant: string, question: string) {

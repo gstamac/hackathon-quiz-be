@@ -3,6 +3,7 @@ import { Game } from '../../interfaces/games.interface'
 import { MessangerService } from '../../services/messanger.service'
 import { delay } from '../../utils/util'
 import { GamesModelInMemory } from '../../models/games.model'
+import { v4 } from 'uuid'
 
 afterAll(async () => {
   await delay(500)
@@ -14,35 +15,35 @@ describe('Testing Game Runners', () => {
   let gameRunner: GameRunnerService
 
   const game: Game = {
-    id: 'test-game-id',
+    id: v4(),
     access_token: 'access_token',
     channel_id: 'channel_id',
     name: 'test-game',
     questions: [
       {
-        id: 'test-game-q1',
+        id: v4(),
         question: 'Q1',
         answers: [
-          { id: 'test-game-q1-a1', answer: 'Q1A1', is_correct: false },
-          { id: 'test-game-q1-a2', answer: 'Q1A2', is_correct: false },
-          { id: 'test-game-q1-a3', answer: 'Q1A3', is_correct: true },
+          { id: v4(), answer: 'Q1A1', is_correct: false },
+          { id: v4(), answer: 'Q1A2', is_correct: false },
+          { id: v4(), answer: 'Q1A3', is_correct: true },
         ],
       },
       {
-        id: 'test-game-q2',
+        id: v4(),
         question: 'Q2',
         answers: [
-          { id: 'test-game-q2-a1', answer: 'Q2A1', is_correct: false },
-          { id: 'test-game-q2-a2', answer: 'Q2A2', is_correct: true },
-          { id: 'test-game-q2-a3', answer: 'Q2A3', is_correct: false },
+          { id: v4(), answer: 'Q2A1', is_correct: false },
+          { id: v4(), answer: 'Q2A2', is_correct: true },
+          { id: v4(), answer: 'Q2A3', is_correct: false },
         ],
       },
       {
-        id: 'test-game-q3',
+        id: v4(),
         question: 'Q3',
         answers: [
-          { id: 'test-game-q3-a1', answer: 'Q3A1', is_correct: false },
-          { id: 'test-game-q3-a2', answer: 'Q3A2', is_correct: true },
+          { id: v4(), answer: 'Q3A1', is_correct: false },
+          { id: v4(), answer: 'Q3A2', is_correct: true },
         ],
       },
     ],

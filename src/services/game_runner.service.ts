@@ -24,17 +24,17 @@ export class GameRunnerService {
 
   public async acceptAnswer(game: Game, answer: ParticipantAnswer) {
     const status = this.gamesModel.getStatus(game.id)
-    if (status.participantAnswers.some(p => p.question_id === answer.question_id && p.is_correct)) {
+    if (status.participant_answers.some(p => p.question_id === answer.question_id && p.is_correct)) {
       throw new HttpException(400, 'Question already answered')
     }
 
-    if (status.participantAnswers.some(p => p.question_id === answer.question_id && p.participant === answer.participant)) {
+    if (status.participant_answers.some(p => p.question_id === answer.question_id && p.participant === answer.participant)) {
       throw new HttpException(400, 'You already answered this question')
     }
 
     this.gamesModel.addAnswer(status, answer)
 
-    if (status.participantAnswers.some(p => p.question_id === answer.question_id && p.is_correct)) {
+    if (status.participant_answers.some(p => p.question_id === answer.question_id && p.is_correct)) {
       await this.sendNextQuestion(game, answer)
     }
   }
@@ -51,7 +51,7 @@ export class GameRunnerService {
     if (game.questions.length > status.current_question) {
       await this.messangerService.sendQuestionMessage(game, game.questions[status.current_question])
     } else {
-      const leaderboard = status.participantAnswers
+      const leaderboard = status.participant_answers
         .filter(a => a.is_correct)
         .reduce((board, a) => {
           const r = board.find(p => p.participant === a.participant)
