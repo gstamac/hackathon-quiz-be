@@ -68,6 +68,7 @@ export class GameRunnerService {
         }, [])
         .sort((b1, b2) => b2.correct - b1.correct)
 
+      this.gamesModel.setWinner(status, leaderboard[0].participant)
       await this.messangerService.sendEndOfGameMessage(game, leaderboard)
     }
   }

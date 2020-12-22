@@ -9,6 +9,7 @@ export interface GamesModel {
   getStatus(game_id: string): GameStatus
   addAnswer(status: GameStatus, answer: ParticipantAnswer)
   nextQuestion(status: GameStatus)
+  setWinner(status: GameStatus, winner: string)
   setMessageId(game_id: string, messages_id: string)
   setCurrentQuestionMessageId(game_id: string, messages_id: string)
 }
@@ -61,6 +62,10 @@ export class GamesModelInMemory implements GamesModel {
 
   public nextQuestion(status: GameStatus) {
     status.current_question++
+  }
+
+  public setWinner(status: GameStatus, winner: string) {
+    status.winner = winner
   }
 
   public setMessageId(game_id: string, messages_id: string) {
@@ -123,6 +128,11 @@ export class GamesModelInDb implements GamesModel {
 
   public nextQuestion(status: GameStatus) {
     status.current_question++
+    this.dbService.saveGameStatus(status).then()
+  }
+
+  public setWinner(status: GameStatus, winner: string) {
+    status.winner = winner
     this.dbService.saveGameStatus(status).then()
   }
 
