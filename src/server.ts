@@ -15,9 +15,11 @@ import { delayer } from './utils/util'
 validateEnv()
 
 const gamesModel: GamesModel = new GamesModelInDb()
-const messangerService = new MessangerService(gamesModel)
-const gamesService = new GamesService(gamesModel, new GameRunnerService(gamesModel, messangerService, delayer))
+gamesModel.init().then(() => {
+  const messangerService = new MessangerService(gamesModel)
+  const gamesService = new GamesService(gamesModel, new GameRunnerService(gamesModel, messangerService, delayer))
 
-const app = new App([new IndexRoute(), new GamesRoute(new GamesController(gamesService)), new AnswersRoute(new AnswersController(gamesService))])
+  const app = new App([new IndexRoute(), new GamesRoute(new GamesController(gamesService)), new AnswersRoute(new AnswersController(gamesService))])
 
-app.listen()
+  app.listen()
+})
