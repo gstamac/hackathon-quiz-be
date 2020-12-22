@@ -1,5 +1,5 @@
 import { HttpException } from '../exceptions/HttpException'
-import { Game, ParticipantAnswer, Question } from '../interfaces/games.interface'
+import { Game, ParticipantAnswer } from '../interfaces/games.interface'
 import { GamesModel } from '../models/games.model'
 import { Delayer } from '../utils/util'
 import { MessangerService } from './messanger.service'
@@ -69,7 +69,9 @@ export class GameRunnerService {
         }, [])
         .sort((b1, b2) => b2.correct - b1.correct)
 
-      await this.gamesModel.setWinner(status, leaderboard[0].participant)
+      if (leaderboard.length > 0) {
+        await this.gamesModel.setWinner(status, leaderboard[0].participant)
+      }
 
       await this.messangerService.sendEndOfGameMessage(game, leaderboard)
     }
@@ -81,6 +83,7 @@ export class GameRunnerService {
 
     if (status.current_question === current_question) {
       await this.messangerService.updateQuestionTimedout(game, game.questions[current_question])
+      await this.sendNextQuestion(game)
     }
   }
 }

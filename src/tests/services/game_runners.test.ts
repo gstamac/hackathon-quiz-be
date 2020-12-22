@@ -87,6 +87,7 @@ describe('Testing Game Runners', () => {
 
       expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[0])
       expect(messanger.updateQuestionTimedout).toBeCalledWith(game, game.questions[0])
+      expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[1])
     })
   })
 
