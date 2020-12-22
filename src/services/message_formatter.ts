@@ -60,7 +60,7 @@ export function formatEndOfGameMessage(game: Game, winner: string, afterWinnerRa
     icon: {
       type: 'HACKATON_ICON',
     },
-    title_text: 'Congratulation',
+    title_text: 'Congratulations',
     primary_text: `Winner: ${winner}`,
     secondary_text: `Followed by: ${afterWinnerRankings}`,
     additional_text: '',
