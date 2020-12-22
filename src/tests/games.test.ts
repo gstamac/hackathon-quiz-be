@@ -1,35 +1,24 @@
 import supertest from 'supertest'
-import nock from 'nock'
-import { App } from '../app'
-import { GamesRoute } from '../routes/games.route'
 import { CreateGameDto } from '../dtos/games.dto'
 import { delay } from '../utils/util'
-import { AnswersRoute } from '../routes/answers.route'
-import { MESSAGING_URL } from '../config'
 import { Game } from '../interfaces/games.interface'
-import { gameModel } from '../models/games.model'
+import { initTestApp } from './helpers'
+import { GamesModel, GamesModelInMemory } from '../models/games.model'
 
 afterAll(async () => {
   await delay(500)
 })
 
 describe('Testing Games', () => {
+  let gamesModel: GamesModel
+  let request: supertest.SuperTest<supertest.Test>
+
+  beforeEach(() => {
+    gamesModel = new GamesModelInMemory()
+    request = initTestApp(gamesModel)
+  })
+
   describe('[POST] /games', () => {
-    let request: supertest.SuperTest<supertest.Test>
-
-    beforeEach(() => {
-      const app = new App([new GamesRoute(), new AnswersRoute()])
-      request = supertest(app.getServer())
-      nock(`${MESSAGING_URL}`)
-        .post('/v1/messages')
-        .reply(200, [{ id: 'message-id' }])
-        .persist()
-      nock(`${MESSAGING_URL}`)
-        .put('/v1/message-cards')
-        .reply(200, [{ id: 'message-id' }])
-        .persist()
-    })
-
     it('response statusCode 201 / created', async () => {
       const gameData: CreateGameDto = {
         name: 'test-game',
@@ -55,8 +44,6 @@ describe('Testing Games', () => {
   })
 
   describe('[GET] /games/:game_id', () => {
-    let request: supertest.SuperTest<supertest.Test>
-
     const game: Game = {
       id: 'test-game-id',
       access_token: 'access_token',
@@ -66,20 +53,7 @@ describe('Testing Games', () => {
     }
 
     beforeEach(() => {
-      const app = new App([new GamesRoute(), new AnswersRoute()])
-      request = supertest(app.getServer())
-      nock(`${MESSAGING_URL}`)
-        .post('/v1/messages')
-        .reply(200, [{ id: 'message-id' }])
-        .persist()
-      nock(`${MESSAGING_URL}`)
-        .put('/v1/message-cards')
-        .reply(200, [{ id: 'message-id' }])
-        .persist()
-
-      gameModel.clear()
-
-      gameModel.addGame(game)
+      gamesModel.addGame(game)
     })
 
     it('response statusCode 200', async () => {
@@ -88,8 +62,6 @@ describe('Testing Games', () => {
   })
 
   describe('[DELETE] /games/:game_id', () => {
-    let request: supertest.SuperTest<supertest.Test>
-
     const game: Game = {
       id: 'test-game-id',
       access_token: 'access_token',
@@ -99,26 +71,15 @@ describe('Testing Games', () => {
     }
 
     beforeEach(() => {
-      const app = new App([new GamesRoute(), new AnswersRoute()])
-      request = supertest(app.getServer())
-      nock(`${MESSAGING_URL}`)
-        .post('/v1/messages')
-        .reply(200, [{ id: 'message-id' }])
-        .persist()
-      nock(`${MESSAGING_URL}`)
-        .put('/v1/message-cards')
-        .reply(200, [{ id: 'message-id' }])
-        .persist()
+      const gamesModel = new GamesModelInMemory()
 
-      gameModel.clear()
-
-      gameModel.addGame(game)
+      gamesModel.addGame(game)
     })
 
     it('response statusCode 204', async () => {
       await request.delete('/games/test-game-id').expect(204)
 
-      expect(gameModel.findGame('test-game-id')).toBeUndefined()
+      expect(gamesModel.findGame('test-game-id')).toBeUndefined()
     })
   })
 })

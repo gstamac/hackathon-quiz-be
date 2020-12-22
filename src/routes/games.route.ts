@@ -7,9 +7,8 @@ import { validationMiddleware } from '../middlewares/validation.middleware'
 export class GamesRoute implements Route {
   public path = '/games'
   public router = Router()
-  public gamesController = new GamesController()
 
-  constructor() {
+  constructor(private gamesController: GamesController) {
     this.initializeRoutes()
   }
 

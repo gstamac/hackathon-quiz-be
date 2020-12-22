@@ -1,6 +1,19 @@
-import { Game, GameStatus } from '../interfaces/games.interface'
+import { Game, GameStatus, ParticipantAnswer } from '../interfaces/games.interface'
 
-class GameModel {
+export interface GamesModel {
+  addGame(game: Game)
+  clear() // test
+  findGame(game_id: string): Game | undefined
+  deleteGame(game_id: string): void
+  createStatus(game_id: string): GameStatus
+  getStatus(game_id: string): GameStatus
+  addAnswer(status: GameStatus, answer: ParticipantAnswer)
+  nextQuestion(status: GameStatus)
+  setMessageId(game_id: string, messages_id: string)
+  setCurrentQuestionMessageId(game_id: string, messages_id: string)
+}
+
+export class GamesModelInMemory implements GamesModel {
   private games: Game[] = []
   private gameStatuses: GameStatus[] = []
 
@@ -46,6 +59,24 @@ class GameModel {
 
     return status
   }
+
+  public addAnswer(status: GameStatus, answer: ParticipantAnswer) {
+    status.participantAnswers.push(answer)
+  }
+
+  public nextQuestion(status: GameStatus) {
+    status.current_question++
+  }
+
+  public setMessageId(game_id: string, messages_id: string) {
+    const status = this.getStatus(game_id)
+    status.message_id = messages_id
+  }
+
+  public setCurrentQuestionMessageId(game_id: string, messages_id: string) {
+    const status = this.getStatus(game_id)
+    status.current_question_message_id = messages_id
+  }
 }
 
-export const gameModel: GameModel = new GameModel()
+export const gamesModel: GamesModel = new GamesModelInMemory()

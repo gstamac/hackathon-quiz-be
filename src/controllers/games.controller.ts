@@ -1,14 +1,16 @@
 import { NextFunction, Request, Response } from 'express'
 import { CreateGameDto } from '../dtos/games.dto'
 import { Game } from '../interfaces/games.interface'
-import { gamesService } from '../services/games.service'
+import { GamesService } from '../services/games.service'
 import { logger } from '../utils/logger'
 
 export class GamesController {
+  constructor(private gamesService: GamesService) {}
+
   public createGame = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const gameData: CreateGameDto = req.body
-      const createGameData: Game = await gamesService.createGame(gameData)
+      const createGameData: Game = await this.gamesService.createGame(gameData)
       res.status(201).json({ data: createGameData, message: 'created' })
     } catch (error) {
       logger.error(error)
@@ -18,7 +20,7 @@ export class GamesController {
 
   public getGame = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      res.status(200).json(await gamesService.getGame(req.params.id))
+      res.status(200).json(await this.gamesService.getGame(req.params.id))
     } catch (error) {
       logger.error(error)
       next(error)
@@ -27,7 +29,7 @@ export class GamesController {
 
   public deleteGame = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      res.status(204).json(await gamesService.deleteGame(req.params.id))
+      res.status(204).json(await this.gamesService.deleteGame(req.params.id))
     } catch (error) {
       logger.error(error)
       next(error)

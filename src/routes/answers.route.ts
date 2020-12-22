@@ -5,9 +5,8 @@ import { Route } from '../interfaces/routes.interface'
 export class AnswersRoute implements Route {
   public path = '/games/:game_id/answers'
   public router = Router()
-  public answersController = new AnswersController()
 
-  constructor() {
+  constructor(private answersController: AnswersController) {
     this.initializeRoutes()
   }
 

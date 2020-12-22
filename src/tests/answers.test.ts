@@ -1,35 +1,24 @@
 import supertest from 'supertest'
-import nock from 'nock'
-import { App } from '../app'
 import { Game } from '../interfaces/games.interface'
-import { gameModel } from '../models/games.model'
-import { AnswersRoute } from '../routes/answers.route'
-import { GamesRoute } from '../routes/games.route'
+import { GamesModel, GamesModelInMemory } from '../models/games.model'
 import { delay } from '../utils/util'
-import { MESSAGING_URL } from '../config'
+import { initTestApp } from './helpers'
 
 afterAll(async () => {
   await delay(500)
 })
 
 describe('Testing Answers', () => {
+  let gamesModel: GamesModel
+  let request: supertest.SuperTest<supertest.Test>
+
+  beforeEach(() => {
+    gamesModel = new GamesModelInMemory()
+    request = initTestApp(gamesModel)
+  })
+
   describe('[POST] /games/:game_id/answers?question_id=<question_id>&answer_id=<answer_id>&participant=<participant>', () => {
-    let request: supertest.SuperTest<supertest.Test>
-
     beforeEach(() => {
-      const app = new App([new GamesRoute(), new AnswersRoute()])
-      request = supertest(app.getServer())
-      nock(`${MESSAGING_URL}`)
-        .post('/v1/messages')
-        .reply(200, [{ id: 'message-id' }])
-        .persist()
-      nock(`${MESSAGING_URL}`)
-        .put('/v1/message-cards')
-        .reply(200, [{ id: 'message-id' }])
-        .persist()
-
-      gameModel.clear()
-
       const game: Game = {
         id: 'test-game-id',
         access_token: 'access_token',
@@ -65,7 +54,7 @@ describe('Testing Answers', () => {
         ],
       }
 
-      gameModel.addGame(game)
+      gamesModel.addGame(game)
     })
 
     it('response statusCode 201 / created', async () => {

@@ -1,14 +1,14 @@
 import { CreateGameDto, CreateParticipantAnswerDto } from '../dtos/games.dto'
 import { HttpException } from '../exceptions/HttpException'
 import { Answer, Game, ParticipantAnswer, Question } from '../interfaces/games.interface'
-import { gameModel } from '../models/games.model'
+import { GamesModel } from '../models/games.model'
 import { isEmpty } from '../utils/util'
 import { v4 } from 'uuid'
 import { GameRunnerService } from './game_runner.service'
 import { MessangerService } from './messanger.service'
 
 export class GamesService {
-  constructor(private gameRunnerService: GameRunnerService, private messangerService: MessangerService) {}
+  constructor(private gamesModel: GamesModel, private gameRunnerService: GameRunnerService, private messangerService: MessangerService) {}
 
   public async createGame(gameData: CreateGameDto): Promise<Game> {
     if (isEmpty(gameData)) throw new HttpException(400, 'Game data missing')
@@ -30,7 +30,7 @@ export class GamesService {
       })),
     }
 
-    gameModel.addGame(game)
+    this.gamesModel.addGame(game)
 
     await this.gameRunnerService.startGame(game)
 
@@ -38,7 +38,7 @@ export class GamesService {
   }
 
   public async getGame(game_id: string): Promise<Game> {
-    const game: Game | undefined = gameModel.findGame(game_id)
+    const game: Game | undefined = this.gamesModel.findGame(game_id)
     if (game === undefined) {
       throw new HttpException(400, 'Game not found')
     }
@@ -47,7 +47,7 @@ export class GamesService {
   }
 
   public async deleteGame(game_id: string): Promise<void> {
-    gameModel.deleteGame(game_id)
+    this.gamesModel.deleteGame(game_id)
   }
 
   public async createParticipantAnswer(game_id: string, answerData: CreateParticipantAnswerDto): Promise<ParticipantAnswer> {
@@ -55,7 +55,7 @@ export class GamesService {
       throw new HttpException(400, 'Answer data missing')
     }
 
-    const game: Game | undefined = gameModel.findGame(game_id)
+    const game: Game | undefined = this.gamesModel.findGame(game_id)
     if (game === undefined) {
       throw new HttpException(400, 'Game not found')
     }
@@ -82,6 +82,3 @@ export class GamesService {
     return participantAnswer
   }
 }
-
-const messangerService = new MessangerService()
-export const gamesService: GamesService = new GamesService(new GameRunnerService(messangerService), messangerService)

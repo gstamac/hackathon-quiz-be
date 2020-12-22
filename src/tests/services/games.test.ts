@@ -3,6 +3,7 @@ import { MessangerService } from '../../services/messanger.service'
 import { delay } from '../../utils/util'
 import { GamesService } from '../../services/games.service'
 import { CreateGameDto } from '../../dtos/games.dto'
+import { GamesModelInMemory } from '../../models/games.model'
 
 afterAll(async () => {
   await delay(500)
@@ -52,15 +53,15 @@ describe('Testing Game Runners', () => {
       acceptAnswer: jest.fn(),
     } as unknown) as GameRunnerService
 
-    messanger = {
+    messanger = ({
       sendStartGameInMessage: jest.fn(),
       sendStartGameMessage: jest.fn(),
       sendQuestionMessage: jest.fn(),
       updateQuestionAnswered: jest.fn(),
       sendEndOfGameMessage: jest.fn(),
-    }
+    } as unknown) as MessangerService
 
-    gamesService = new GamesService(gameRunner, messanger)
+    gamesService = new GamesService(new GamesModelInMemory(), gameRunner, messanger)
   })
 
   describe('createGame', () => {
