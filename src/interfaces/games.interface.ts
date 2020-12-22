@@ -33,3 +33,8 @@ export interface GameStatus {
   participant_answers: ParticipantAnswer[]
   winner?: string
 }
+
+export interface LeaderBoardEntry {
+  participant: string
+  correct: number
+}

@@ -53,6 +53,30 @@ export function formatEndOfGameMessage(game: Game, winner: string): AddMessageBo
   }
 }
 
+export function formatEndOfGameNoAnswersMessage(game: Game): AddMessageBody {
+  const element: MessageCardElement = {
+    icon: {
+      type: 'HACKATON_ICON',
+    },
+    primary_text: 'Too hard?',
+    secondary_text: `No answers from participants`,
+    additional_text: '',
+  }
+
+  return {
+    message: {
+      uuid: v4(),
+      type: 'CARD_VIEW',
+      content: JSON.stringify({
+        text: 'Quiz has ended',
+        elements: element,
+        payload: {},
+      }),
+    },
+    channels: [game.channel_id],
+  }
+}
+
 export function formatQuestionMessage(game: Game, question: Question): AddMessageBody {
   const element: MessageCardElement = {
     icon: {
