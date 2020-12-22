@@ -19,6 +19,10 @@ export class GamesDbService {
     await this.db.exec(
       `CREATE TABLE IF NOT EXISTS game_status (game_id text REFERENCES game(id), message_id text, current_question integer, current_question_message_id text, participant_answers text, inserted_at DEFAULT CURRENT_TIMESTAMP, updated_at DEFAULT CURRENT_TIMESTAMP);`,
     )
+
+    try {
+      await this.db.exec(`ALTER TABLE game_status ADD COLUMN winner text`)
+    } catch {}
   }
 
   public async saveGame(game: Game) {
