@@ -2,7 +2,7 @@ import supertest from 'supertest'
 import nock from 'nock'
 import { App } from '../app'
 import { GamesController } from '../controllers/games.controller'
-import { GamesModel } from '../models/games.model'
+import { GamesModel, GamesModelInDb } from '../models/games.model'
 import { AnswersRoute } from '../routes/answers.route'
 import { GamesRoute } from '../routes/games.route'
 import { GamesService } from '../services/games.service'
@@ -32,3 +32,7 @@ export function initTestApp(gamesModel: GamesModel): supertest.SuperTest<superte
 
   return request
 }
+
+beforeAll(async () => {
+  await new GamesModelInDb().init(true)
+})

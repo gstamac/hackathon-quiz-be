@@ -2,6 +2,7 @@ import { GamesDbService } from '../dao/db'
 import { Game, GameStatus, ParticipantAnswer } from '../interfaces/games.interface'
 
 export interface GamesModel {
+  init(clear?: boolean): Promise<void>
   addGame(game: Game): Promise<void>
   findGame(game_id: string): Promise<Game | undefined>
   deleteGame(game_id: string): Promise<void>
@@ -17,6 +18,13 @@ export interface GamesModel {
 export class GamesModelInMemory implements GamesModel {
   private games: Game[] = []
   private gameStatuses: GameStatus[] = []
+
+  public async init(clear = false): Promise<void> {
+    if (clear) {
+      this.games = []
+      this.gameStatuses = []
+    }
+  }
 
   public async addGame(game: Game): Promise<void> {
     this.games.push(game)
@@ -82,9 +90,12 @@ export class GamesModelInMemory implements GamesModel {
 export class GamesModelInDb implements GamesModel {
   private dbService: GamesDbService
 
-  constructor(clear = false) {
+  constructor() {
     this.dbService = new GamesDbService()
-    this.dbService.init(clear).then()
+  }
+
+  public async init(clear = false): Promise<void> {
+    await this.dbService.init(clear)
   }
 
   public async addGame(game: Game): Promise<void> {
@@ -123,28 +134,28 @@ export class GamesModelInDb implements GamesModel {
 
   public async addAnswer(status: GameStatus, answer: ParticipantAnswer): Promise<void> {
     status.participant_answers.push(answer)
-    await this.dbService.saveGameStatus(status)
+    await this.dbService.updateGameStatus(status)
   }
 
   public async nextQuestion(status: GameStatus): Promise<void> {
     status.current_question++
-    await this.dbService.saveGameStatus(status)
+    await this.dbService.updateGameStatus(status)
   }
 
   public async setWinner(status: GameStatus, winner: string): Promise<void> {
     status.winner = winner
-    await this.dbService.saveGameStatus(status)
+    await this.dbService.updateGameStatus(status)
   }
 
   public async setMessageId(game_id: string, messages_id: string): Promise<void> {
     const status = await this.getStatus(game_id)
     status.message_id = messages_id
-    await this.dbService.saveGameStatus(status)
+    await this.dbService.updateGameStatus(status)
   }
 
   public async setCurrentQuestionMessageId(game_id: string, messages_id: string): Promise<void> {
     const status = await this.getStatus(game_id)
     status.current_question_message_id = messages_id
-    await this.dbService.saveGameStatus(status)
+    await this.dbService.updateGameStatus(status)
   }
 }

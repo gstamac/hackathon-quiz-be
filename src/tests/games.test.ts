@@ -4,6 +4,7 @@ import { delay } from '../utils/util'
 import { Game } from '../interfaces/games.interface'
 import { initTestApp } from './helpers'
 import { GamesModel, GamesModelInDb } from '../models/games.model'
+import { v4 } from 'uuid'
 
 afterAll(async () => {
   await delay(500)
@@ -13,8 +14,9 @@ describe('Testing Games', () => {
   let gamesModel: GamesModel
   let request: supertest.SuperTest<supertest.Test>
 
-  beforeEach(() => {
-    gamesModel = new GamesModelInDb(true)
+  beforeEach(async () => {
+    gamesModel = new GamesModelInDb()
+    await gamesModel.init()
     request = initTestApp(gamesModel)
   })
 
@@ -45,7 +47,7 @@ describe('Testing Games', () => {
 
   describe('[GET] /games/:game_id', () => {
     const game: Game = {
-      id: 'test-game-id',
+      id: v4(),
       access_token: 'access_token',
       channel_id: 'channel_id',
       name: 'test-game',
@@ -53,19 +55,21 @@ describe('Testing Games', () => {
     }
 
     beforeEach(async () => {
+      game.id = v4()
+
       await gamesModel.addGame(game)
 
       await delay(500)
     })
 
     it('response statusCode 200', async () => {
-      await request.get('/games/test-game-id').expect(200, game)
+      await request.get(`/games/${game.id}`).expect(200, game)
     })
   })
 
   describe('[DELETE] /games/:game_id', () => {
     const game: Game = {
-      id: 'test-game-id',
+      id: v4(),
       access_token: 'access_token',
       channel_id: 'channel_id',
       name: 'test-game',
@@ -73,15 +77,17 @@ describe('Testing Games', () => {
     }
 
     beforeEach(async () => {
+      game.id = v4()
+
       await gamesModel.addGame(game)
 
       await delay(500)
     })
 
     it('response statusCode 204', async () => {
-      await request.delete('/games/test-game-id').expect(204)
+      await request.delete(`/games/${game.id}`).expect(204)
 
-      expect(await gamesModel.findGame('test-game-id')).toBeUndefined()
+      expect(await gamesModel.findGame(game.id)).toBeUndefined()
     })
   })
 })

@@ -53,31 +53,31 @@ export class GamesDbService {
   }
 
   public async saveGameStatus(gameStatus: GameStatus) {
-    if (this.getGameStatus(gameStatus.game_id) === undefined) {
-      await this.db
-        .prepare(
-          `insert into game_status (game_id, message_id, current_question, current_question_message_id, participant_answers) values (?, ?, ?, ?, ?);`,
-        )
-        .run(
-          gameStatus.game_id,
-          gameStatus.message_id,
-          gameStatus.current_question,
-          gameStatus.current_question_message_id,
-          JSON.stringify(gameStatus.participant_answers),
-        )
-    } else {
-      await this.db
-        .prepare(
-          `UPDATE game_status SET message_id = ?, current_question = ?, current_question_message_id = ?, participant_answers = ? WHERE game_id = ?;`,
-        )
-        .run(
-          gameStatus.message_id,
-          gameStatus.current_question,
-          gameStatus.current_question_message_id,
-          JSON.stringify(gameStatus.participant_answers),
-          gameStatus.game_id,
-        )
-    }
+    await this.db
+      .prepare(
+        `insert into game_status (game_id, message_id, current_question, current_question_message_id, participant_answers) values (?, ?, ?, ?, ?);`,
+      )
+      .run(
+        gameStatus.game_id,
+        gameStatus.message_id,
+        gameStatus.current_question,
+        gameStatus.current_question_message_id,
+        JSON.stringify(gameStatus.participant_answers),
+      )
+  }
+
+  public async updateGameStatus(gameStatus: GameStatus) {
+    await this.db
+      .prepare(
+        `UPDATE game_status SET message_id = ?, current_question = ?, current_question_message_id = ?, participant_answers = ? WHERE game_id = ?;`,
+      )
+      .run(
+        gameStatus.message_id,
+        gameStatus.current_question,
+        gameStatus.current_question_message_id,
+        JSON.stringify(gameStatus.participant_answers),
+        gameStatus.game_id,
+      )
   }
 
   public async getGameStatus(game_id: string) {
