@@ -1,7 +1,7 @@
 import * as rankFormatterService from '../../services/player_rank_formatter'
 import { LeaderBoardEntry } from '../../interfaces/games.interface'
 
-describe('Testing Game Runners', () => {
+describe('Player rank formatter', () => {
   it('format rankings if less than three participants', async () => {
     const leaderBoard: LeaderBoardEntry[] = [
       { participant: 'participant1', correct: 2 },

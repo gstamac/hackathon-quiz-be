@@ -2,6 +2,7 @@ import { v4 } from 'uuid'
 import { BASE_URL } from '../config'
 import { Game, Question } from '../interfaces/games.interface'
 import { AddMessageBody, MessageCardElement, UpdateMessageContent } from './messaging_interfaces'
+import { formatQuestionsCountText } from './questions_count_formatter'
 
 export function formatMessage(game: Game, content: UpdateMessageContent): AddMessageBody {
   return {
@@ -105,8 +106,8 @@ export function formatQuestionMessage(game: Game, question: Question): AddMessag
     icon: {
       type: 'HACKATON_ICON',
     },
-    title_text: `Question: ${question.question}`,
-    primary_text: `Question: ${question.question}`,
+    title_text: `Question ${formatQuestionsCountText(question, game.questions)}`,
+    primary_text: question.question,
     secondary_text: '',
     additional_text: '',
     buttons: question.answers.map(a => ({
