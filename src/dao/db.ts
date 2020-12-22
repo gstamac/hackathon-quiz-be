@@ -35,6 +35,7 @@ export class GamesDbService {
     const game = this.db.prepare(`select * from game where id = ?`).get(id)
 
     if (game !== undefined) {
+      game.channel_id = `${game.channel_id}`
       game.questions = JSON.parse(game.questions as string)
       delete game.inserted_at
       delete game.updated_at
