@@ -11,7 +11,7 @@ import {
   formatEndOfGameNoAnswersMessage,
 } from './message_formatter'
 import { GamesModel } from '../models/games.model'
-import { formatPlayerRankText } from './player_rank_formatter'
+import { formatAfterWinnerRankingText } from './player_rank_formatter'
 import { UpdateMessageContent } from './messaging_interfaces'
 
 export class MessangerService {
@@ -49,8 +49,8 @@ export class MessangerService {
   }
   public async sendEndOfGameMessage(game: Game, leaderBoard: LeaderBoardEntry[]): Promise<void> {
     if (leaderBoard.length > 0) {
-      const rankingsText: string = formatPlayerRankText(leaderBoard)
-      await sendMessage(game.access_token, formatEndOfGameMessage(game, rankingsText))
+      const afterWinnerRankings: string = formatAfterWinnerRankingText(leaderBoard)
+      await sendMessage(game.access_token, formatEndOfGameMessage(game, leaderBoard[0].participant, afterWinnerRankings))
     } else {
       await sendMessage(game.access_token, formatEndOfGameNoAnswersMessage(game))
     }

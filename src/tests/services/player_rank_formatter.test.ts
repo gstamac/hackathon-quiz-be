@@ -8,7 +8,7 @@ describe('Player rank formatter', () => {
       { participant: 'participant2', correct: 1 },
     ]
 
-    expect(rankFormatterService.formatPlayerRankText(leaderBoard)).toEqual('participant1 (2), participant2 (1)')
+    expect(rankFormatterService.formatAfterWinnerRankingText(leaderBoard)).toEqual('participant2 (1)')
   })
 
   it('format rankings if more than three participants', async () => {
@@ -19,6 +19,6 @@ describe('Player rank formatter', () => {
       { participant: 'participant4', correct: 1 },
     ]
 
-    expect(rankFormatterService.formatPlayerRankText(leaderBoard)).toEqual('participant1 (8), participant2 (6), participant3 (3)')
+    expect(rankFormatterService.formatAfterWinnerRankingText(leaderBoard)).toEqual('participant2 (6), participant3 (3)')
   })
 })

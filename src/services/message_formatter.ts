@@ -19,7 +19,6 @@ export function formatStartGameContent(): UpdateMessageContent {
     icon: {
       type: 'HACKATON_ICON',
     },
-    title_text: 'Quiz has started',
     primary_text: 'Quiz has started',
     secondary_text: '',
     additional_text: '',
@@ -40,10 +39,10 @@ export function formatStartGameInContent(time: number): UpdateMessageContent {
     icon: {
       type: 'HACKATON_ICON',
     },
-    title_text: `Quiz will start in ${time} seconds`,
-    primary_text: `Quiz will start in ${time} seconds`,
+    primary_text: 'Quiz will start in',
     secondary_text: '',
     additional_text: '',
+    countdown_seconds: 5,
   }
 
   return {
@@ -56,14 +55,14 @@ export function formatStartGameInContent(time: number): UpdateMessageContent {
   }
 }
 
-export function formatEndOfGameMessage(game: Game, winner: string): AddMessageBody {
+export function formatEndOfGameMessage(game: Game, winner: string, afterWinnerRankings: string): AddMessageBody {
   const element: MessageCardElement = {
     icon: {
       type: 'HACKATON_ICON',
     },
-    title_text: 'Quiz has ended',
-    primary_text: 'Quiz has ended',
-    secondary_text: `The winner is ${winner}`,
+    title_text: 'Congratulation',
+    primary_text: `Winner: ${winner}`,
+    secondary_text: `Followed by: ${afterWinnerRankings}`,
     additional_text: '',
   }
 
@@ -85,6 +84,7 @@ export function formatEndOfGameNoAnswersMessage(game: Game): AddMessageBody {
     primary_text: 'Too hard?',
     secondary_text: `No answers from participants`,
     additional_text: '',
+    disabled: true,
   }
 
   return {
