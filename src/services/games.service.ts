@@ -5,7 +5,6 @@ import { GamesModel } from '../models/games.model'
 import { isEmpty } from '../utils/util'
 import { v4 } from 'uuid'
 import { GameRunnerService } from './game_runner.service'
-import { MessangerService } from './messanger.service'
 
 export class GamesService {
   constructor(private gamesModel: GamesModel, private gameRunnerService: GameRunnerService) {}

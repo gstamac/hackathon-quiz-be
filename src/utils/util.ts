@@ -1,5 +1,3 @@
-import { async } from 'rxjs'
-
 export const isEmpty = (value: any): boolean => {
   if (value === null) {
     return true
