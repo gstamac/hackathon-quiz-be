@@ -106,7 +106,7 @@ export function formatQuestionMessage(game: Game, question: Question): AddMessag
     icon: {
       type: 'HACKATON_ICON',
     },
-    title_text: `${formatQuestionsCountText(question, game.questions)}`,
+    title_text: `Question ${formatQuestionsCountText(question, game.questions)}`,
     primary_text: question.question,
     secondary_text: '',
     additional_text: '',
