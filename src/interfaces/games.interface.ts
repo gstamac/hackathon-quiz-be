@@ -32,3 +32,8 @@ export interface GameStatus {
   current_question_message_id?: string
   participant_answers: ParticipantAnswer[]
 }
+
+export interface LeaderBoardEntry {
+  participant: string
+  correct: number
+}

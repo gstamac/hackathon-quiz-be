@@ -139,7 +139,10 @@ describe('Testing Game Runners', () => {
       expect(messanger.updateQuestionAnswered).toBeCalledWith(game, game.questions[1], 'participant2')
       expect(messanger.sendQuestionMessage).toBeCalledWith(game, game.questions[2])
       expect(messanger.updateQuestionAnswered).toBeCalledWith(game, game.questions[2], 'participant1')
-      expect(messanger.sendEndOfGameMessage).toBeCalledWith(game, 'participant1')
+      expect(messanger.sendEndOfGameMessage).toBeCalledWith(game, [
+        { participant: 'participant1', correct: 2 },
+        { participant: 'participant2', correct: 1 },
+      ])
     })
   })
 })

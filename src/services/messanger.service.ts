@@ -1,8 +1,15 @@
 import { MESSAGING_URL } from '../config'
-import { Game, Question } from '../interfaces/games.interface'
+import { Game, LeaderBoardEntry, Question } from '../interfaces/games.interface'
 import { init, sendMessage, updateMessage } from './messaging_service'
-import { formatQuestionMessage, formatStartGameMessage, formatQuestionAnsweredMessage, formatEndOfGameMessage } from './message_formatter'
+import {
+  formatQuestionMessage,
+  formatStartGameMessage,
+  formatQuestionAnsweredMessage,
+  formatEndOfGameMessage,
+  formatEndOfGameNoAnswersMessage,
+} from './message_formatter'
 import { GamesModel } from '../models/games.model'
+import { formatPlayerRankText } from './player_rank_formatter'
 
 export class MessangerService {
   constructor(private gamesModel: GamesModel) {
@@ -26,7 +33,12 @@ export class MessangerService {
     const status = this.gamesModel.getStatus(game.id)
     await updateMessage(game.access_token, { message_id: status.current_question_message_id }, formatQuestionAnsweredMessage(question, participant))
   }
-  public async sendEndOfGameMessage(game: Game, winner: string): Promise<void> {
-    await sendMessage(game.access_token, formatEndOfGameMessage(game, winner))
+  public async sendEndOfGameMessage(game: Game, leaderBoard: LeaderBoardEntry[]): Promise<void> {
+    if (leaderBoard.length > 0) {
+      const rankingsText: string = formatPlayerRankText(leaderBoard)
+      await sendMessage(game.access_token, formatEndOfGameMessage(game, rankingsText))
+    } else {
+      await sendMessage(game.access_token, formatEndOfGameNoAnswersMessage(game))
+    }
   }
 }
