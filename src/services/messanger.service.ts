@@ -46,12 +46,16 @@ export class MessangerService {
 
   public async updateQuestionAnswered(game: Game, question: Question, participant: string): Promise<void> {
     const status = await this.gamesModel.getStatus(game.id)
-    await updateMessage(game.access_token, { message_id: status.current_question_message_id }, formatQuestionAnsweredContent(question, participant))
+    await updateMessage(
+      game.access_token,
+      { message_id: status.current_question_message_id },
+      formatQuestionAnsweredContent(game, question, participant),
+    )
   }
 
   public async updateQuestionTimedout(game: Game, question: Question): Promise<void> {
     const status = await this.gamesModel.getStatus(game.id)
-    await updateMessage(game.access_token, { message_id: status.current_question_message_id }, formatQuestionTimedoutContent(question))
+    await updateMessage(game.access_token, { message_id: status.current_question_message_id }, formatQuestionTimedoutContent(game, question))
   }
 
   public async sendEndOfGameMessage(game: Game, leaderBoard: LeaderBoardEntry[]): Promise<void> {

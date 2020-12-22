@@ -1,7 +1,7 @@
 import { v4 } from 'uuid'
 import { BASE_URL, QUESTION_TIMEOUT, START_GAME_DELAY } from '../config'
 import { Game, Question } from '../interfaces/games.interface'
-import { AddMessageBody, MessageCardElement, UpdateMessageContent } from './messaging_interfaces'
+import { AddMessageBody, MessageCardElement, MessageTemplateButtonItem, UpdateMessageContent } from './messaging_interfaces'
 import { formatQuestionsCountText } from './questions_count_formatter'
 
 export function formatMessage(game: Game, content: UpdateMessageContent): AddMessageBody {
@@ -22,6 +22,7 @@ export function formatStartGameContent(): UpdateMessageContent {
     primary_text: 'Quiz has started',
     secondary_text: '',
     additional_text: '',
+    disabled: true,
   }
 
   return {
@@ -130,15 +131,17 @@ export function formatQuestionMessage(game: Game, question: Question): AddMessag
   })
 }
 
-export function formatQuestionAnsweredContent(question: Question, participant: string): UpdateMessageContent {
+export function formatQuestionAnsweredContent(game: Game, question: Question, participant: string): UpdateMessageContent {
   const element: MessageCardElement = {
     icon: {
       type: 'HACKATON_ICON',
     },
-    title_text: `Question: ${question.question}`,
-    primary_text: `Question: ${question.question}`,
+    title_text: `Question ${formatQuestionsCountText(question, game.questions)}`,
+    primary_text: question.question,
     secondary_text: `Answered correctly by ${participant}`,
     additional_text: '',
+    disabled: true,
+    buttons: getDisabledButtons(game, question),
   }
 
   return {
@@ -151,15 +154,17 @@ export function formatQuestionAnsweredContent(question: Question, participant: s
   }
 }
 
-export function formatQuestionTimedoutContent(question: Question): UpdateMessageContent {
+export function formatQuestionTimedoutContent(game: Game, question: Question): UpdateMessageContent {
   const element: MessageCardElement = {
     icon: {
       type: 'HACKATON_ICON',
     },
-    title_text: `Question: ${question.question}`,
-    primary_text: `Question: ${question.question}`,
+    title_text: `Question ${formatQuestionsCountText(question, game.questions)}`,
+    primary_text: question.question,
     secondary_text: `Nobody answered correctly in time`,
     additional_text: '',
+    disabled: true,
+    buttons: getDisabledButtons(game, question),
   }
 
   return {
@@ -170,4 +175,14 @@ export function formatQuestionTimedoutContent(question: Question): UpdateMessage
       payload: {},
     }),
   }
+}
+
+function getDisabledButtons(game: Game, question: Question): MessageTemplateButtonItem[] {
+  return question.answers.map(a => ({
+    title: a.answer,
+    type: 'OUTLINED',
+    cta_type: 'DEEPLINK',
+    cta_link: `${BASE_URL}/games/${game.id}/answers?question_id=${question.id}&answer_id=${a.id}&participant=`,
+    mode: a.is_correct ? 'PRIMARY' : 'SECONDARY',
+  }))
 }
