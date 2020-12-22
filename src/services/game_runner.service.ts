@@ -1,5 +1,5 @@
 import { HttpException } from '../exceptions/HttpException'
-import { Game, ParticipantAnswer } from '../interfaces/games.interface'
+import { Game, ParticipantAnswer, Question } from '../interfaces/games.interface'
 import { GamesModel } from '../models/games.model'
 import { Delayer } from '../utils/util'
 import { MessangerService } from './messanger.service'
@@ -15,7 +15,7 @@ export class GameRunnerService {
 
   private async startGameProcedure(game: Game): Promise<void> {
     await this.messangerService.sendStartGameInMessage(game)
-    await this.delayer.delay(5)
+    await this.delayer.delayStartGame()
     await this.messangerService.sendStartGameMessage(game)
 
     await this.sendNextQuestion(game)
@@ -48,7 +48,9 @@ export class GameRunnerService {
     await this.gamesModel.nextQuestion(status)
 
     if (game.questions.length > status.current_question) {
-      await this.messangerService.sendQuestionMessage(game, game.questions[status.current_question])
+      const current_question = status.current_question
+      await this.messangerService.sendQuestionMessage(game, game.questions[current_question])
+      this.startQuestionCountdown(game, current_question)
     } else {
       const leaderboard = status.participant_answers
         .filter(a => a.is_correct)
@@ -73,12 +75,12 @@ export class GameRunnerService {
     }
   }
 
-  // private async findGameAndExecute<T>(game_id: string, task: (game: Game) => Promise<T>): Promise<T> {
-  //   const game: Game | undefined = gamesModel.findGame(game_id)
-  //   if (game === undefined) {
-  //     return
-  //   }
+  private async startQuestionCountdown(game: Game, current_question: number) {
+    await this.delayer.delayQuestionCountdown()
+    const status = await this.gamesModel.getStatus(game.id)
 
-  //   return await task(game)
-  // }
+    if (status.current_question === current_question) {
+      await this.messangerService.updateQuestionTimedout(game, game.questions[current_question])
+    }
+  }
 }

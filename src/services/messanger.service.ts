@@ -9,6 +9,7 @@ import {
   formatStartGameContent,
   formatStartGameInContent,
   formatEndOfGameNoAnswersMessage,
+  formatQuestionTimedoutContent,
 } from './message_formatter'
 import { GamesModel } from '../models/games.model'
 import { formatAfterWinnerRankingText } from './player_rank_formatter'
@@ -47,6 +48,12 @@ export class MessangerService {
     const status = await this.gamesModel.getStatus(game.id)
     await updateMessage(game.access_token, { message_id: status.current_question_message_id }, formatQuestionAnsweredContent(question, participant))
   }
+
+  public async updateQuestionTimedout(game: Game, question: Question): Promise<void> {
+    const status = await this.gamesModel.getStatus(game.id)
+    await updateMessage(game.access_token, { message_id: status.current_question_message_id }, formatQuestionTimedoutContent(question))
+  }
+
   public async sendEndOfGameMessage(game: Game, leaderBoard: LeaderBoardEntry[]): Promise<void> {
     if (leaderBoard.length > 0) {
       const afterWinnerRankings: string = formatAfterWinnerRankingText(leaderBoard)

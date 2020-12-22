@@ -15,7 +15,10 @@ export function initTestApp(gamesModel: GamesModel): supertest.SuperTest<superte
   const messangerService = new MessangerService(gamesModel)
   const gamesService = new GamesService(
     gamesModel,
-    new GameRunnerService(gamesModel, messangerService, { delay: jest.fn().mockResolvedValue(undefined) }),
+    new GameRunnerService(gamesModel, messangerService, {
+      delayStartGame: jest.fn().mockResolvedValue(undefined),
+      delayQuestionCountdown: jest.fn().mockResolvedValue(undefined),
+    }),
   )
 
   const app = new App([new GamesRoute(new GamesController(gamesService)), new AnswersRoute(new AnswersController(gamesService))])

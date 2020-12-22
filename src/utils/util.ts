@@ -1,3 +1,5 @@
+import { QUESTION_TIMEOUT, START_GAME_DELAY } from '../config'
+
 export const isEmpty = (value: any): boolean => {
   if (value === null) {
     return true
@@ -17,9 +19,11 @@ export async function delay(timeout: number): Promise<void> {
 }
 
 export interface Delayer {
-  delay(seconds: number): Promise<void>
+  delayStartGame(): Promise<void>
+  delayQuestionCountdown(): Promise<void>
 }
 
 export const delayer: Delayer = {
-  delay: async (seconds: number) => await delay(seconds * 1000),
+  delayStartGame: async () => await delay(START_GAME_DELAY * 1000 + 500),
+  delayQuestionCountdown: async () => await delay(QUESTION_TIMEOUT * 1000 + 500),
 }

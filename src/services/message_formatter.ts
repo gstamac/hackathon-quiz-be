@@ -1,5 +1,5 @@
 import { v4 } from 'uuid'
-import { BASE_URL } from '../config'
+import { BASE_URL, QUESTION_TIMEOUT, START_GAME_DELAY } from '../config'
 import { Game, Question } from '../interfaces/games.interface'
 import { AddMessageBody, MessageCardElement, UpdateMessageContent } from './messaging_interfaces'
 import { formatQuestionsCountText } from './questions_count_formatter'
@@ -42,7 +42,7 @@ export function formatStartGameInContent(time: number): UpdateMessageContent {
     primary_text: 'Quiz will start in',
     secondary_text: '',
     additional_text: '',
-    countdown_seconds: 5,
+    countdown_seconds: START_GAME_DELAY,
   }
 
   return {
@@ -110,6 +110,7 @@ export function formatQuestionMessage(game: Game, question: Question): AddMessag
     primary_text: question.question,
     secondary_text: '',
     additional_text: '',
+    countdown_seconds: QUESTION_TIMEOUT,
     buttons: question.answers.map(a => ({
       title: a.answer,
       type: 'OUTLINED',
@@ -137,6 +138,27 @@ export function formatQuestionAnsweredContent(question: Question, participant: s
     title_text: `Question: ${question.question}`,
     primary_text: `Question: ${question.question}`,
     secondary_text: `Answered correctly by ${participant}`,
+    additional_text: '',
+  }
+
+  return {
+    type: 'CARD_VIEW',
+    content: JSON.stringify({
+      text: `Question: ${question.question}`,
+      elements: element,
+      payload: {},
+    }),
+  }
+}
+
+export function formatQuestionTimedoutContent(question: Question): UpdateMessageContent {
+  const element: MessageCardElement = {
+    icon: {
+      type: 'HACKATON_ICON',
+    },
+    title_text: `Question: ${question.question}`,
+    primary_text: `Question: ${question.question}`,
+    secondary_text: `Nobody answered correctly in time`,
     additional_text: '',
   }
 
