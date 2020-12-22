@@ -3,7 +3,7 @@ import { CreateGameDto } from '../dtos/games.dto'
 import { delay } from '../utils/util'
 import { Game } from '../interfaces/games.interface'
 import { initTestApp } from './helpers'
-import { GamesModel, GamesModelInMemory } from '../models/games.model'
+import { GamesModel, GamesModelInDb } from '../models/games.model'
 
 afterAll(async () => {
   await delay(500)
@@ -14,7 +14,7 @@ describe('Testing Games', () => {
   let request: supertest.SuperTest<supertest.Test>
 
   beforeEach(() => {
-    gamesModel = new GamesModelInMemory()
+    gamesModel = new GamesModelInDb(true)
     request = initTestApp(gamesModel)
   })
 
@@ -71,8 +71,6 @@ describe('Testing Games', () => {
     }
 
     beforeEach(() => {
-      const gamesModel = new GamesModelInMemory()
-
       gamesModel.addGame(game)
     })
 

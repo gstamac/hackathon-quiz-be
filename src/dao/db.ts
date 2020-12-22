@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3'
-import { Game, GameStatus, ParticipantAnswer } from '../interfaces/games.interface'
+import { Game, GameStatus } from '../interfaces/games.interface'
 
 export class GamesDbService {
   private db: Database.Database
@@ -27,25 +27,13 @@ export class GamesDbService {
       .run(game.id, game.channel_id, game.access_token, game.name, JSON.stringify(game.questions))
   }
 
-  public async saveGameStatus(gameStatus: GameStatus) {
-    await this.db
-      .prepare(
-        `insert into game_status (game_id, message_id, current_question, current_question_message_id, participant_answers) values (?, ?, ?, ?, ?);`,
-      )
-      .run(
-        gameStatus.game_id,
-        gameStatus.message_id,
-        gameStatus.current_question,
-        gameStatus.current_question_message_id,
-        JSON.stringify(gameStatus.participant_answers),
-      )
-  }
-
   public getGameById(id: string) {
     const game = this.db.prepare(`select * from game where id = ?`).get(id)
 
     if (game !== undefined) {
       game.questions = JSON.parse(game.questions as string)
+      delete game.inserted_at
+      delete game.updated_at
     }
 
     return game
@@ -59,17 +47,43 @@ export class GamesDbService {
     return this.db.prepare(`select * from game where channel_id = ?`).all(channel_id) as Game[]
   }
 
+  public async saveGameStatus(gameStatus: GameStatus) {
+    if (this.getGameStatus(gameStatus.game_id) === undefined) {
+      await this.db
+        .prepare(
+          `insert into game_status (game_id, message_id, current_question, current_question_message_id, participant_answers) values (?, ?, ?, ?, ?);`,
+        )
+        .run(
+          gameStatus.game_id,
+          gameStatus.message_id,
+          gameStatus.current_question,
+          gameStatus.current_question_message_id,
+          JSON.stringify(gameStatus.participant_answers),
+        )
+    } else {
+      await this.db
+        .prepare(
+          `UPDATE game_status SET message_id = ?, current_question = ?, current_question_message_id = ?, participant_answers = ? WHERE game_id = ?;`,
+        )
+        .run(
+          gameStatus.message_id,
+          gameStatus.current_question,
+          gameStatus.current_question_message_id,
+          JSON.stringify(gameStatus.participant_answers),
+          gameStatus.game_id,
+        )
+    }
+  }
+
   public getGameStatus(game_id: string) {
     const status = this.db.prepare(`select * from game_status where game_id = ?`).get(game_id)
 
     if (status !== undefined) {
       status.participant_answers = JSON.parse(status.participant_answers)
+      delete status.inserted_at
+      delete status.updated_at
     }
 
     return status
-  }
-
-  public getParticipantAnswer(participant: string, question: string) {
-    return this.db.prepare(`select * from participant_answer where participant = ? and question = ?`).get(participant, question) as ParticipantAnswer
   }
 }

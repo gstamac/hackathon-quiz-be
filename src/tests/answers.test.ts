@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import { Game } from '../interfaces/games.interface'
-import { GamesModel, GamesModelInMemory } from '../models/games.model'
+import { GamesModel, GamesModelInDb } from '../models/games.model'
 import { delay } from '../utils/util'
 import { initTestApp } from './helpers'
 
@@ -13,7 +13,7 @@ describe('Testing Answers', () => {
   let request: supertest.SuperTest<supertest.Test>
 
   beforeEach(() => {
-    gamesModel = new GamesModelInMemory()
+    gamesModel = new GamesModelInDb(true)
     request = initTestApp(gamesModel)
   })
 
