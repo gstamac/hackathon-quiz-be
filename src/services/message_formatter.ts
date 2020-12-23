@@ -105,3 +105,28 @@ export function formatQuestionAnsweredMessage(question: Question, participant: s
     }),
   }
 }
+
+export function formatStatsMessage(secondaryText: string, channelId: string): AddMessageBody {
+  const element: MessageCardElement = {
+    icon: {
+      type: 'HACKATON_ICON',
+    },
+    title_text: `All time channel highscores`,
+    primary_text: ``,
+    secondary_text: secondaryText,
+    additional_text: '',
+  }
+
+  return {
+    message: {
+      uuid: v4(),
+      type: 'CARD_VIEW',
+      content: JSON.stringify({
+        text: `All time channel highscores`,
+        elements: element,
+        payload: {},
+      }),
+    },
+    channels: [channelId],
+  }
+}

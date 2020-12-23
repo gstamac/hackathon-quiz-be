@@ -10,13 +10,22 @@ import { GameRunnerService } from './services/game_runner.service'
 import { GamesModel, GamesModelInDb } from './models/games.model'
 import { GamesController } from './controllers/games.controller'
 import { AnswersController } from './controllers/answers.controller'
+import { HighscoresRoute } from './routes/highscores.route'
+import { HighscoresController } from './controllers/highscores.controller'
+import { HighscoreService } from './services/highscore.service'
 
 validateEnv()
 
 const gamesModel: GamesModel = new GamesModelInDb()
 const messangerService = new MessangerService(gamesModel)
 const gamesService = new GamesService(gamesModel, new GameRunnerService(gamesModel, messangerService), messangerService)
+const highscoreService = new HighscoreService()
 
-const app = new App([new IndexRoute(), new GamesRoute(new GamesController(gamesService)), new AnswersRoute(new AnswersController(gamesService))])
+const app = new App([
+  new IndexRoute(),
+  new GamesRoute(new GamesController(gamesService)),
+  new AnswersRoute(new AnswersController(gamesService)),
+  new HighscoresRoute(new HighscoresController(highscoreService)),
+])
 
 app.listen()

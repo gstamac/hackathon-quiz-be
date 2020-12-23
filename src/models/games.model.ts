@@ -147,4 +147,12 @@ export class GamesModelInDb implements GamesModel {
     status.current_question_message_id = messages_id
     this.dbService.saveGameStatus(status).then()
   }
+
+  public getGameWins(channel_id: string) {
+    return this.dbService.getGameWinners(channel_id)
+  }
+
+  public getChannelAnswers(channel_id: string) {
+    return this.dbService.getParticipantAnswersForChannel(channel_id)
+  }
 }
