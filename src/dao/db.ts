@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3'
 import { Game, GameStatus } from '../interfaces/games.interface'
+import { logger } from '../utils/logger'
 
 export class GamesDbService {
   private db: Database.Database
@@ -93,7 +94,7 @@ export class GamesDbService {
   }
 
   public async getParticipantAnswersForChannel(channel_id: string) {
-    const answers: string[] = this.db
+    const answers: string[] = await this.db
       .prepare(
         `select participant_answers from game_status gs 
       join game g on g.id = gs.game_id where g.channel_id = ?`,
@@ -101,7 +102,8 @@ export class GamesDbService {
       .all(channel_id)
       .map(obj => obj.participant_answers)
 
-    return answers.map((a: string) => JSON.parse(a)[0])
+    console.log(`answers:`, answers)
+    return answers.map((a: string) => JSON.parse(a))
   }
 
   public async getGameWinners(channel_id: string): Promise<string[]> {
