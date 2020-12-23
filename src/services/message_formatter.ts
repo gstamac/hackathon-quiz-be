@@ -190,6 +190,18 @@ export function formatStatsMessage(secondaryText: string, channelId: string): Ad
     additional_text: '',
   }
 
+  console.log({
+    message: {
+      uuid: v4(),
+      type: 'CARD_VIEW',
+      content: JSON.stringify({
+        text: `All time channel highscores`,
+        elements: element,
+        payload: {},
+      }),
+    },
+    channels: [channelId],
+  })
   return {
     message: {
       uuid: v4(),

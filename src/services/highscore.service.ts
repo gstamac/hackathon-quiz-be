@@ -9,7 +9,9 @@ export class HighscoreService {
   public async fetchStats(channel_id: string): Promise<Map<string, number>[]> {
     const totalAnswers: Map<string, number> = new Map<string, number>()
     const allAnswers: ParticipantAnswer[] = await this.gamesModel.getChannelAnswers(channel_id)
-    allAnswers.map((a: ParticipantAnswer) => {
+    // eslint-disable-next-line prefer-spread
+    const allAnswersFlattened: ParticipantAnswer[] = [].concat.apply([], allAnswers)
+    allAnswersFlattened.map((a: ParticipantAnswer) => {
       if (!totalAnswers.has(a.participant)) {
         totalAnswers.set(a.participant, 0)
       }
@@ -43,19 +45,23 @@ export class HighscoreService {
     let msg = ``
     let i = 0
 
-    msg += `Correct answers:\n`
-    for (const [key, value] of statsMap[0].entries()) {
-      if (i > 2) break
-      msg += `${key} - ${value}\n`
-      i++
+    if (statsMap[0].size > 0) {
+      msg += `Correct answers:\n`
+      for (const [key, value] of statsMap[0].entries()) {
+        if (i > 2) break
+        msg += `${key} - ${value}\n`
+        i++
+      }
     }
 
-    i = 0
-    msg += `Most wins:\n`
-    for (const [key, value] of statsMap[1].entries()) {
-      if (i > 2) break
-      msg += `${key} - ${value}\n`
-      i++
+    if (statsMap[1].size > 0) {
+      i = 0
+      msg += `Most wins:\n`
+      for (const [key, value] of statsMap[1].entries()) {
+        if (i > 2) break
+        msg += `${key} - ${value}\n`
+        i++
+      }
     }
 
     return formatStatsMessage(msg, channelId)

@@ -1,6 +1,5 @@
 import Database from 'better-sqlite3'
 import { Game, GameStatus } from '../interfaces/games.interface'
-import { logger } from '../utils/logger'
 
 export class GamesDbService {
   private db: Database.Database
@@ -70,13 +69,14 @@ export class GamesDbService {
   public async updateGameStatus(gameStatus: GameStatus) {
     await this.db
       .prepare(
-        `UPDATE game_status SET message_id = ?, current_question = ?, current_question_message_id = ?, participant_answers = ? WHERE game_id = ?;`,
+        `UPDATE game_status SET message_id = ?, current_question = ?, current_question_message_id = ?, participant_answers = ?, winner = ? WHERE game_id = ?;`,
       )
       .run(
         gameStatus.message_id,
         gameStatus.current_question,
         gameStatus.current_question_message_id,
         JSON.stringify(gameStatus.participant_answers),
+        gameStatus.winner,
         gameStatus.game_id,
       )
   }
@@ -101,8 +101,8 @@ export class GamesDbService {
       )
       .all(channel_id)
       .map(obj => obj.participant_answers)
+      .filter(obj => obj != null)
 
-    console.log(`answers:`, answers)
     return answers.map((a: string) => JSON.parse(a))
   }
 
@@ -114,5 +114,6 @@ export class GamesDbService {
       )
       .all(channel_id)
       .map(obj => obj.winner)
+      .filter(obj => obj != null)
   }
 }
