@@ -4,11 +4,11 @@ import { formatStatsMessage } from './message_formatter'
 import { AddMessageBody } from './messaging_interfaces'
 
 export class HighscoreService {
-  private db = new GamesModelInDb()
+  constructor(private gamesModel: GamesModelInDb) {}
 
   public async fetchStats(channel_id: string): Promise<Map<string, number>[]> {
     const totalAnswers: Map<string, number> = new Map<string, number>()
-    const allAnswers: ParticipantAnswer[] = await this.db.getChannelAnswers(channel_id)
+    const allAnswers: ParticipantAnswer[] = await this.gamesModel.getChannelAnswers(channel_id)
     allAnswers.map((a: ParticipantAnswer) => {
       if (!totalAnswers.has(a.participant)) {
         totalAnswers.set(a.participant, 0)
@@ -22,8 +22,11 @@ export class HighscoreService {
     const sortedTotalAnswers = new Map([...totalAnswers.entries()].sort((a, b) => b[1] - a[1]))
 
     const totalWins: Map<string, number> = new Map<string, number>()
-    const allWinners: string[] = await this.db.getGameWins(channel_id)
+    const allWinners: string[] = await this.gamesModel.getGameWins(channel_id)
+
     allWinners.map((p: string) => {
+      if (p === undefined) return
+
       if (!totalWins.has(p)) {
         totalWins.set(p, 1)
         return

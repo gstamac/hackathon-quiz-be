@@ -95,22 +95,22 @@ export class GamesDbService {
   public async getParticipantAnswersForChannel(channel_id: string) {
     const answers: string[] = this.db
       .prepare(
-        `select participant_answers from game_status gs where g.channel_id = ?
-      inner join game g on g.id = gs.game_id`,
+        `select participant_answers from game_status gs 
+      join game g on g.id = gs.game_id where g.channel_id = ?`,
       )
       .all(channel_id)
       .map(obj => obj.participant_answers)
 
-    return answers.map((a: string) => JSON.parse(a))
+    return answers.map((a: string) => JSON.parse(a)[0])
   }
 
   public async getGameWinners(channel_id: string): Promise<string[]> {
     return this.db
       .prepare(
-        `select winner from game_status gs where g.channel_id = ?
-    inner join game g on g.id = gs.game_id`,
+        `select winner from game_status gs 
+    join game g on g.id = gs.game_id where g.channel_id = ?`,
       )
-      .get(channel_id)
+      .all(channel_id)
       .map(obj => obj.winner)
   }
 }
