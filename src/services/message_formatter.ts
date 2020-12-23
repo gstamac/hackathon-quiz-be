@@ -56,7 +56,7 @@ export function formatStartGameInContent(time: number): UpdateMessageContent {
   }
 }
 
-export function formatEndOfGameMessage(game: Game, winner: string, afterWinnerRankings: string): AddMessageBody {
+export function formatEndOfGameMessage(game: Game, winnerText: string, afterWinnerRankings: string): AddMessageBody {
   const follwedByText: string = afterWinnerRankings ? `\n${afterWinnerRankings}` : 'no competition'
 
   const element: MessageCardElement = {
@@ -64,7 +64,7 @@ export function formatEndOfGameMessage(game: Game, winner: string, afterWinnerRa
       type: 'HACKATON_ICON',
     },
     title_text: 'Congratulations',
-    primary_text: `Winner: ${winner}`,
+    primary_text: `Winner: ${winnerText}`,
     secondary_text: `Followed by: ${follwedByText}`,
     additional_text: '',
   }
@@ -143,6 +143,7 @@ export function formatQuestionAnsweredContent(game: Game, question: Question, pa
     secondary_text: `Answered correctly by ${participant}`,
     additional_text: '',
     disabled: true,
+    countdown_seconds: 0,
     buttons: getDisabledButtons(game, question),
   }
 
