@@ -185,8 +185,7 @@ export function formatStatsMessage(secondaryText: string, channelId: string): Ad
     icon: {
       type: 'HACKATON_ICON',
     },
-    title_text: `All time channel highscores`,
-    primary_text: ``,
+    primary_text: `All time channel stats`,
     secondary_text: secondaryText,
     additional_text: '',
   }
@@ -196,7 +195,7 @@ export function formatStatsMessage(secondaryText: string, channelId: string): Ad
       uuid: v4(),
       type: 'CARD_VIEW',
       content: JSON.stringify({
-        text: `All time channel highscores`,
+        text: `All time channel stats`,
         elements: element,
         payload: {},
       }),
