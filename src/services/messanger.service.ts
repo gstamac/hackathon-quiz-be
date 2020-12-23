@@ -60,7 +60,7 @@ export class MessangerService {
 
   public async sendEndOfGameMessage(game: Game, leaderBoard: LeaderBoardEntry[]): Promise<void> {
     if (leaderBoard.length > 0) {
-      const winnerText = `${leaderBoard[0].participant} ${leaderBoard[0].correct}/${game.questions.length}`
+      const winnerText = `${leaderBoard[0].participant} (${leaderBoard[0].correct}/${game.questions.length})`
       const afterWinnerRankings: string = formatAfterWinnerRankingText(leaderBoard, game.questions.length)
       await sendMessage(game.access_token, formatEndOfGameMessage(game, winnerText, afterWinnerRankings))
     } else {
