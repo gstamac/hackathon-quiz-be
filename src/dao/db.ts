@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3'
 import { Game, GameStatus } from '../interfaces/games.interface'
+import { logger } from '../utils/logger'
 
 export class GamesDbService {
   private db: Database.Database
@@ -101,7 +102,8 @@ export class GamesDbService {
       .all(channel_id)
       .map(obj => obj.participant_answers)
 
-    return answers.map((a: string) => JSON.parse(a)[0])
+    logger.debug(`answers:`, answers)
+    return answers.map((a: string) => JSON.parse(a))
   }
 
   public async getGameWinners(channel_id: string): Promise<string[]> {
