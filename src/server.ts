@@ -22,7 +22,7 @@ const gamesModel: GamesModel = new GamesModelInDb()
 gamesModel.init().then(() => {
   const messangerService = new MessangerService(gamesModel)
   const gamesService = new GamesService(gamesModel, new GameRunnerService(gamesModel, messangerService, delayer))
-  const highscoreService = new HighscoreService(gamesModel)
+  const highscoreService = new HighscoreService(<GamesModelInDb>gamesModel)
 
   const app = new App([
     new IndexRoute(),
