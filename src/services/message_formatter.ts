@@ -57,13 +57,15 @@ export function formatStartGameInContent(time: number): UpdateMessageContent {
 }
 
 export function formatEndOfGameMessage(game: Game, winner: string, afterWinnerRankings: string): AddMessageBody {
+  const follwedByText: string = afterWinnerRankings ? `\n${afterWinnerRankings}` : 'no competition'
+
   const element: MessageCardElement = {
     icon: {
       type: 'HACKATON_ICON',
     },
     title_text: 'Congratulations',
     primary_text: `Winner: ${winner}`,
-    secondary_text: `Followed by: ${afterWinnerRankings}`,
+    secondary_text: `Followed by: ${follwedByText}`,
     additional_text: '',
   }
 
