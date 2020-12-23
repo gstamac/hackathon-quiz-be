@@ -31,10 +31,11 @@ export class GamesDbService {
       .run(game.id, game.channel_id, game.access_token, game.name, JSON.stringify(game.questions))
   }
 
-  public getGameById(id: string) {
-    const game = this.db.prepare(`select * from game where id = ?`).get(id)
+  public async getGameById(id: string) {
+    const game = await this.db.prepare(`select * from game where id = ?`).get(id)
 
     if (game !== undefined) {
+      game.channel_id = `${game.channel_id}`
       game.questions = JSON.parse(game.questions as string)
       delete game.inserted_at
       delete game.updated_at
@@ -47,40 +48,40 @@ export class GamesDbService {
     await this.db.prepare(`DELETE from game where id = ?`).run(id)
   }
 
-  public getGamesForChannel(channel_id: string) {
-    return this.db.prepare(`select * from game where channel_id = ?`).all(channel_id) as Game[]
+  public async getGamesForChannel(channel_id: string) {
+    return (await this.db.prepare(`select * from game where channel_id = ?`).all(channel_id)) as Game[]
   }
 
   public async saveGameStatus(gameStatus: GameStatus) {
-    if (this.getGameStatus(gameStatus.game_id) === undefined) {
-      await this.db
-        .prepare(
-          `insert into game_status (game_id, message_id, current_question, current_question_message_id, participant_answers) values (?, ?, ?, ?, ?);`,
-        )
-        .run(
-          gameStatus.game_id,
-          gameStatus.message_id,
-          gameStatus.current_question,
-          gameStatus.current_question_message_id,
-          JSON.stringify(gameStatus.participant_answers),
-        )
-    } else {
-      await this.db
-        .prepare(
-          `UPDATE game_status SET message_id = ?, current_question = ?, current_question_message_id = ?, participant_answers = ? WHERE game_id = ?;`,
-        )
-        .run(
-          gameStatus.message_id,
-          gameStatus.current_question,
-          gameStatus.current_question_message_id,
-          JSON.stringify(gameStatus.participant_answers),
-          gameStatus.game_id,
-        )
-    }
+    await this.db
+      .prepare(
+        `insert into game_status (game_id, message_id, current_question, current_question_message_id, participant_answers) values (?, ?, ?, ?, ?);`,
+      )
+      .run(
+        gameStatus.game_id,
+        gameStatus.message_id,
+        gameStatus.current_question,
+        gameStatus.current_question_message_id,
+        JSON.stringify(gameStatus.participant_answers),
+      )
   }
 
-  public getGameStatus(game_id: string) {
-    const status = this.db.prepare(`select * from game_status where game_id = ?`).get(game_id)
+  public async updateGameStatus(gameStatus: GameStatus) {
+    await this.db
+      .prepare(
+        `UPDATE game_status SET message_id = ?, current_question = ?, current_question_message_id = ?, participant_answers = ? WHERE game_id = ?;`,
+      )
+      .run(
+        gameStatus.message_id,
+        gameStatus.current_question,
+        gameStatus.current_question_message_id,
+        JSON.stringify(gameStatus.participant_answers),
+        gameStatus.game_id,
+      )
+  }
+
+  public async getGameStatus(game_id: string) {
+    const status = await this.db.prepare(`select * from game_status where game_id = ?`).get(game_id)
 
     if (status !== undefined) {
       status.participant_answers = JSON.parse(status.participant_answers)

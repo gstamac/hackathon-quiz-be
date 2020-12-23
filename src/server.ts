@@ -13,19 +13,23 @@ import { AnswersController } from './controllers/answers.controller'
 import { HighscoresRoute } from './routes/highscores.route'
 import { HighscoresController } from './controllers/highscores.controller'
 import { HighscoreService } from './services/highscore.service'
+import { delayer } from './utils/util'
 
 validateEnv()
 
 const gamesModel: GamesModel = new GamesModelInDb()
-const messangerService = new MessangerService(gamesModel)
-const gamesService = new GamesService(gamesModel, new GameRunnerService(gamesModel, messangerService), messangerService)
-const highscoreService = new HighscoreService()
 
-const app = new App([
-  new IndexRoute(),
-  new GamesRoute(new GamesController(gamesService)),
-  new AnswersRoute(new AnswersController(gamesService)),
-  new HighscoresRoute(new HighscoresController(highscoreService)),
-])
+gamesModel.init().then(() => {
+  const messangerService = new MessangerService(gamesModel)
+  const gamesService = new GamesService(gamesModel, new GameRunnerService(gamesModel, messangerService, delayer))
+  const highscoreService = new HighscoreService()
 
-app.listen()
+  const app = new App([
+    new IndexRoute(),
+    new GamesRoute(new GamesController(gamesService)),
+    new AnswersRoute(new AnswersController(gamesService)),
+    new HighscoresRoute(new HighscoresController(highscoreService)),
+  ])
+
+  app.listen()
+})

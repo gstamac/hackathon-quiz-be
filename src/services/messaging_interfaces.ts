@@ -163,6 +163,8 @@ export interface MessageCardElement {
   secondary_text?: string
   additional_text?: string
   buttons?: MessageTemplateButtonItem[]
+  countdown_seconds?: number
+  disabled?: boolean
 }
 
 export interface MessageEncryptedCardElement {

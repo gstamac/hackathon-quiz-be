@@ -1,5 +1,4 @@
 import { GameRunnerService } from '../../services/game_runner.service'
-import { MessangerService } from '../../services/messanger.service'
 import { delay } from '../../utils/util'
 import { GamesService } from '../../services/games.service'
 import { CreateGameDto } from '../../dtos/games.dto'
@@ -11,8 +10,6 @@ afterAll(async () => {
 
 describe('Testing Game Runners', () => {
   let gameRunner: GameRunnerService
-
-  let messanger: MessangerService
 
   let gamesService: GamesService
 
@@ -53,15 +50,7 @@ describe('Testing Game Runners', () => {
       acceptAnswer: jest.fn(),
     } as unknown) as GameRunnerService
 
-    messanger = ({
-      sendStartGameInMessage: jest.fn(),
-      sendStartGameMessage: jest.fn(),
-      sendQuestionMessage: jest.fn(),
-      updateQuestionAnswered: jest.fn(),
-      sendEndOfGameMessage: jest.fn(),
-    } as unknown) as MessangerService
-
-    gamesService = new GamesService(new GamesModelInMemory(), gameRunner, messanger)
+    gamesService = new GamesService(new GamesModelInMemory(), gameRunner)
   })
 
   describe('createGame', () => {

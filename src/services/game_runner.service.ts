@@ -1,29 +1,28 @@
 import { HttpException } from '../exceptions/HttpException'
 import { Game, ParticipantAnswer } from '../interfaces/games.interface'
 import { GamesModel } from '../models/games.model'
+import { Delayer } from '../utils/util'
 import { MessangerService } from './messanger.service'
 
 export class GameRunnerService {
-  constructor(private gamesModel: GamesModel, private messangerService: MessangerService) {}
+  constructor(private gamesModel: GamesModel, private messangerService: MessangerService, private delayer: Delayer) {}
 
   public async startGame(game: Game) {
-    this.gamesModel.createStatus(game.id)
+    await this.gamesModel.createStatus(game.id)
 
-    // for (let i = 5; i > 0; i++) {
-    //   await this.findGameAndExecute(game_id, async game => {
-    //     await this.messangerService.sendStartGameInMessage(game, i)
-    //     await delay(second)
-    //   })
-    // }
-    // await this.findGameAndExecute(game_id, async game => {
+    this.startGameProcedure(game)
+  }
+
+  private async startGameProcedure(game: Game): Promise<void> {
+    await this.messangerService.sendStartGameInMessage(game)
+    await this.delayer.delayStartGame()
     await this.messangerService.sendStartGameMessage(game)
-    // })
 
     await this.sendNextQuestion(game)
   }
 
   public async acceptAnswer(game: Game, answer: ParticipantAnswer) {
-    const status = this.gamesModel.getStatus(game.id)
+    const status = await this.gamesModel.getStatus(game.id)
     if (status.participant_answers.some(p => p.question_id === answer.question_id && p.is_correct)) {
       throw new HttpException(400, 'Question already answered')
     }
@@ -32,7 +31,7 @@ export class GameRunnerService {
       throw new HttpException(400, 'You already answered this question')
     }
 
-    this.gamesModel.addAnswer(status, answer)
+    await this.gamesModel.addAnswer(status, answer)
 
     if (status.participant_answers.some(p => p.question_id === answer.question_id && p.is_correct)) {
       await this.sendNextQuestion(game, answer)
@@ -40,16 +39,18 @@ export class GameRunnerService {
   }
 
   private async sendNextQuestion(game: Game, answer?: ParticipantAnswer) {
-    const status = this.gamesModel.getStatus(game.id)
+    const status = await this.gamesModel.getStatus(game.id)
 
     if (answer !== undefined && status.current_question >= 0) {
       await this.messangerService.updateQuestionAnswered(game, game.questions[status.current_question], answer.participant)
     }
 
-    this.gamesModel.nextQuestion(status)
+    await this.gamesModel.nextQuestion(status)
 
     if (game.questions.length > status.current_question) {
-      await this.messangerService.sendQuestionMessage(game, game.questions[status.current_question])
+      const current_question = status.current_question
+      await this.messangerService.sendQuestionMessage(game, game.questions[current_question])
+      this.startQuestionCountdown(game, current_question)
     } else {
       const leaderboard = status.participant_answers
         .filter(a => a.is_correct)
@@ -68,18 +69,21 @@ export class GameRunnerService {
         }, [])
         .sort((b1, b2) => b2.correct - b1.correct)
 
-      this.gamesModel.setWinner(status, leaderboard[0].participant)
+      if (leaderboard.length > 0) {
+        await this.gamesModel.setWinner(status, leaderboard[0].participant)
+      }
 
-      await this.messangerService.sendEndOfGameMessage(game, leaderboard[0].participant)
+      await this.messangerService.sendEndOfGameMessage(game, leaderboard)
     }
   }
 
-  // private async findGameAndExecute<T>(game_id: string, task: (game: Game) => Promise<T>): Promise<T> {
-  //   const game: Game | undefined = gamesModel.findGame(game_id)
-  //   if (game === undefined) {
-  //     return
-  //   }
+  private async startQuestionCountdown(game: Game, current_question: number) {
+    await this.delayer.delayQuestionCountdown()
+    const status = await this.gamesModel.getStatus(game.id)
 
-  //   return await task(game)
-  // }
+    if (status.current_question === current_question) {
+      await this.messangerService.updateQuestionTimedout(game, game.questions[current_question])
+      await this.sendNextQuestion(game)
+    }
+  }
 }
