@@ -143,7 +143,6 @@ export function formatQuestionAnsweredContent(game: Game, question: Question, pa
     secondary_text: `Answered correctly by ${participant}`,
     additional_text: '',
     disabled: true,
-    countdown_seconds: 0,
     buttons: getDisabledButtons(game, question),
   }
 
