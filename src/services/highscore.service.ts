@@ -46,7 +46,7 @@ export class HighscoreService {
     let i = 0
 
     if (statsMap[0].size > 0) {
-      msg += `Correct answers:\n`
+      msg += `<b>Correct answers</b>:\n`
       for (const [key, value] of statsMap[0].entries()) {
         if (i > 2) break
         msg += `${key} - ${value}\n`
@@ -56,7 +56,7 @@ export class HighscoreService {
 
     if (statsMap[1].size > 0) {
       i = 0
-      msg += `Most wins:\n`
+      msg += `\n<b>Most wins</b>:\n`
       for (const [key, value] of statsMap[1].entries()) {
         if (i > 2) break
         msg += `${key} - ${value}\n`
