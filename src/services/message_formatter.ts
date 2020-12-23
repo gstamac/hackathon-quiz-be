@@ -185,23 +185,11 @@ export function formatStatsMessage(secondaryText: string, channelId: string): Ad
       type: 'HACKATON_ICON',
     },
     title_text: `All time channel highscores`,
-    primary_text: ``,
+    primary_text: `Stats`,
     secondary_text: secondaryText,
     additional_text: '',
   }
 
-  console.log({
-    message: {
-      uuid: v4(),
-      type: 'CARD_VIEW',
-      content: JSON.stringify({
-        text: `All time channel highscores`,
-        elements: element,
-        payload: {},
-      }),
-    },
-    channels: [channelId],
-  })
   return {
     message: {
       uuid: v4(),
