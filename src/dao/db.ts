@@ -102,7 +102,7 @@ export class GamesDbService {
       .all(channel_id)
       .map(obj => obj.participant_answers)
 
-    logger.debug(`answers:`, answers)
+    console.log(`answers:`, answers)
     return answers.map((a: string) => JSON.parse(a))
   }
 
