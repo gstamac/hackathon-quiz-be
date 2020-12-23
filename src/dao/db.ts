@@ -94,7 +94,7 @@ export class GamesDbService {
   }
 
   public async getParticipantAnswersForChannel(channel_id: string) {
-    const answers: string[] = this.db
+    const answers: string[] = await this.db
       .prepare(
         `select participant_answers from game_status gs 
       join game g on g.id = gs.game_id where g.channel_id = ?`,
